@@ -4,12 +4,14 @@ const canvasID = 'canv';
 const radius = 575;
 const currentID = 'current';
 
-var sortcount = 5;
+var sortcount = 11;
 var max;
 var spd;
 var cx;
 var cy;
 var ctx;
+var prev;
+var gooah = false;
 var data; // Data that is sorted
 var vdat; // Data that is displayed on screen
 var cols; // Color codes for each data value
@@ -135,6 +137,24 @@ function process(obj) {
                     case 6:
                         quicksort();
                         break;
+					case 7:
+						heapsort();
+						break;
+					case 8:
+						oddeven();
+						break;
+					case 9:
+						gnome();
+						break;
+					case 10:
+						comb();
+						break;
+					case 11:
+						circle();
+						break;
+					case 12:
+						cycle();
+						break;
                 }
                 break;
             case "report": // Report to the console and designated spot in the 
@@ -149,21 +169,25 @@ function process(obj) {
                     togs.push(obj.index);
                 break;
             case "detog": // Clear the array of toggled slices
-                togs = [];
+                //togs = [];
                 break;
             case "wait": // Wait a few frames.
             case "default":
                 break;
         }
     } catch (error) { // Catch an error if there is no more tasks to process
+	console.log(error);
         // Shuffle the array.
         addMode(1);
         detog();
         // Momentarily wait.
         addMode(0);
-        //addMode(6); /* For debugging specific algorithms */
-        // Sort the array with a random sorting algorithm.
-        addMode(2 + Math.floor(Math.random() * sortcount));
+        //addMode(12); /* For debugging specific algorithms */
+		// Sort the array with a random sorting algorithm.
+		var neu = prev;
+		do neu=2+Math.floor(Math.random()*sortcount);while(neu==prev);
+		prev = neu;
+        addMode(prev);
         detog();
         // Momentarily wait.
         addMode(0);
@@ -397,4 +421,173 @@ function quicksort(low, high) {
     }
     log("Quicksort");
     quick(0, max - 1);
+}
+function heapsort() {
+	log("Heapsort");
+	for(let i = Math.floor(max/2)-1;i>=0;i--) {
+		toggle(i, false);
+		heap(max, i);
+	}
+	for(let i = max - 1; i > 0; i--) {
+		swap(0, i);
+		heap(i,0);
+	}
+	function heap(n, i) {
+		var top = i;
+		var lft = 2 * i + 1;
+		var rgt = 2 * i + 2;
+		toggle(lft, false);
+		toggle(rgt, false);
+		
+		if(lft<n && data[lft]>data[top])
+			top = lft;
+		if(rgt<n && data[rgt]>data[top])
+			top = rgt;
+		
+		toggle(top, false);
+		
+		if(top != i) {
+			swap(i, top);
+			detog();
+			heap(n, top);
+		}
+	}
+	detog();
+}
+function oddeven() {
+	log("Odd-Even Sort");
+	var srtd = false;
+	while(!srtd) {
+		srtd = true;
+		for(let i = 1; i <= max-2; i+=2) {
+			if(data[i] > data[i+1]) {
+				toggle(i, true);
+				swap(i, i+1);
+				srtd = false;
+				detog();
+			}
+		}
+		for(let i = 0; i <= max-2; i+=2) {
+			if(data[i] > data[i+1]) {
+				toggle(i, true);
+				swap(i, i+1);
+				srtd = false;
+				detog();
+			}
+		}
+	}
+}
+function gnome() {
+	log("Gnome Sort");
+	var i = 0;
+	while(i < max) {
+		toggle(i, false, true);
+		if(i==0 || data[i] >= data[i-1]) 
+			i++;
+		else {
+			swap(i, i-1);
+			i--;
+		}
+	}
+	detog();
+}
+function comb() {
+	log("Comb Sort");
+	function gap(g) {
+		g = parseInt((g*10)/13,10);
+		if(g < 1)
+			return 1;
+		return g;
+	}
+	var g = max;
+	var swp = true;
+	
+	while(g!=1||swp) {
+		g = gap(g);
+		swp = false;
+		
+		for(let i = 0; i < max-g; i++) {
+			toggle(i);
+			toggle(i+g);
+			if(data[i] > data[i+g]) {
+				swap(i, i+g);
+				swp = true;
+			}
+			detog();
+		}
+	}
+}
+function circle() {
+	log("Circle Sort");
+	function csort(low, high) {
+		var swp = false;
+		if(low == high) return false;
+		
+		var lo = low, hi = high;
+		
+		while(lo < hi) {
+			toggle(lo);
+			toggle(hi);
+			if(data[lo] > data[hi]) {
+				swap(lo, hi);
+				swp = true;
+			}
+			lo++;
+			hi--;
+			detog();
+		}
+		
+		if(lo == hi) 
+			if(data[lo] > data[hi + 1]) {
+				swap(lo, hi+1);
+				swp = true;
+			}
+			
+		var mid = Math.floor((high-low)/2);
+		var fH = csort(low, low+mid);
+		var sH = csort(low+mid+1, high);
+		
+		return swp || fH || sH;
+	}
+	while(csort(0, max-1)) {;}
+}
+function cycle() {
+	log("Cycle Sort");
+	// I copied this from geeks for geeks because I couldn't get it to work properly otherwise
+	function cycleSort(arr, n)
+    {
+        for (let cycle_start = 0; cycle_start <= n - 2; cycle_start++)
+        {
+            let item = cycle_start;
+            let pos = cycle_start;
+            for (let i = cycle_start + 1; i < n; i++)
+                if (arr[i] < arr[item]) {
+                    detog();
+					pos++;
+					toggle(pos, i % 2 != 0);
+				}
+            if (pos == cycle_start)
+                continue;
+            while (arr[item] == arr[pos])
+                pos += 1;
+            if (pos != cycle_start)
+                swap(pos, item);
+            while (pos != cycle_start){
+                pos = cycle_start;
+                for (let i = cycle_start + 1; i < n; i++)
+                    if (arr[i] < arr[item]) {
+                        detog();
+						pos += 1;
+						toggle(pos, i % 4 != 0);
+					}
+                while (item == arr[pos])
+                    pos += 1;
+                if (item != arr[pos]) 
+                    swap(pos, item);
+                
+            }
+        }
+    }
+	cycleSort(data, max);
+	detog();
 }
