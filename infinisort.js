@@ -1,7 +1,7 @@
 // The ID of the canvas objcet which will hold the visualizer
 const canvasID = 'canv'; 
 // The radius of the circle (should be relative to canvas height &/or width
-const radius = 575;
+const rTolerance = 5;
 const currentID = 'current';
 
 var sortcount = 11;
@@ -10,7 +10,10 @@ var spd;
 var cx;
 var cy;
 var ctx;
+var radius;
 var prev;
+var tlast;
+var autosort = true;
 var gooah = false;
 var data; // Data that is sorted
 var vdat; // Data that is displayed on screen
@@ -19,19 +22,38 @@ var task; // Queue of animation tasks
 var mode; // Queue of modes
 var togs; // All toggled slice positions
 var sing; // Seperate single toggle position.
-
 function init(amount, speed) {
-    // Set the number of items & the visualization speed
-    max = amount;
-    spd = speed;
-    // Initialize all of the arrays
-    data = [];
-    vdat = [];
-    cols = [];
+    ctx = document.getElementById(canvasID).getContext('2d');
+    clearTasks();
+    setRadius(getCanvasWidth() / 2);
+    build(amount,speed);
+}
+
+function setRadius(rad) {
+    radius = rad - rTolerance;
+}
+function clearTasks() {
     task = []; 
     mode = []; 
     togs = [];
-    // Fill the data, visual data, and color arrays.
+    sing = -1;
+    tlast = 0;
+}
+function clearData() {
+    data = [];
+    vdat = [];
+    cols = [];
+}
+function setSpeed(speed) {
+    spd = speed;
+}
+function getCanvasWidth() {
+    return document.getElementById(canvasID).getAttributeNode('width').value;
+}
+function getCanvasHeight() {
+    return document.getElementById(canvasID).getAttributeNode('height').value;
+}
+function fillData() {
     for (var i = 0; i < max; i++) {
         // data and vdata should be identical at first.
         data[i] = i + 1;
@@ -41,9 +63,57 @@ function init(amount, speed) {
         // especially since the method to do so is probably inneficient.
         cols[i] = color(i + 1);
     }
+}
+function setAutoSort(bool) {
+    autosort = bool;
+}
+function help() {
+    s = [
+        "init(amount, speed)   - Initialize the infinisort.",
+        "setRadius(rad)        - Set the radius of the color circle.",
+        "clearTasks()          - Clear all animation tasks & associated variables.",
+        "clearData()           - Clear all data, including visual and color data.",
+        "setSpeed(speed)       - Set the speed of the animation.",
+        "getCanvasWidth()      - Get the width of the canvas object.",
+        "getCanvasHeight()     - Get the height of the canvas object.",
+        "fillData()            - Fill the data arrays with numbers.",
+        "help()                - Display a list of commands.",
+        "build(amount, speed)  - Build a circle with the given parameters.",
+        "draw()                - Render the next few animation tasks.",
+        "process(obj)          - Processes a task.",
+        "rotateA(index)        - Get the first rotation of a given slice.",
+        "rotateB(index)        - Get the last rotation of a given slice.",
+        "theta()               - Get the angle of each slice.",
+        "rgb()                 - Get the maximum value a color channel can have.",
+        "color(n)              - Get the color of the nth slice.",
+        "addSwitch()           - Add a switch task.",
+        "addMode(a)            - Add a mode change.",
+        "toggle(index, shrink) - Add a toggle task.",
+        "detog()               - Add a detoggle task.",
+        "cleartogs()           - Clear all toggle variables.",
+        "swap(a, b)            - Swap two points in the data array, then add a swap task.",
+        "log(s)                - Add a report task.",
+        "halt(length)          - Add a certain number of wait tasks."
+    ];
+    s.sort();
+    h = "List of valid commands:";
+    for(let i = 0; i < s.length; i++) {
+        h += "\n" + s[i];
+    }
+    console.log(h);
+}
+
+function build(amount, speed) {
+    // Set the number of items & the visualization speed
+    max = amount;
+    setSpeed(speed);
+    // Initialize all of the arrays
+    clearData();
+    // Fill the data, visual data, and color arrays.
+    fillData();
     // Get the X & Y values of the center of the circle
-    cx = document.getElementById('canv').getAttributeNode('width').value / 2;
-    cy = document.getElementById('canv').getAttributeNode('height').value / 2;
+    cx = getCanvasWidth() / 2;
+    cy = getCanvasHeight() / 2;
     // Draw on the next animation frame
     window.requestAnimationFrame(draw);
 }
@@ -51,56 +121,57 @@ function init(amount, speed) {
 function draw() {
     // Get a boolean for detoggling failsafe.
     boal = false;
-    // Get the contxet of the canvas object
-    ctx = document.getElementById(canvasID).getContext('2d');
     // Repeat as many times as the speed calls for (adaptive depending on the 
     // number of items.)
     for (let i = 0; i < (spd * Math.ceil(max / 250)); i++) {
         // Process the first task in the array.
         process(task[0]);
-        // Toggle tasks have a "shrink" boolean, which keeps the iterator of
-        // this loop from incrementing, slightly shrinking the sort time.
-        if (task[0].type === "toggle") 
-            if (task[0].shrink === true) 
-                i--;
-        // If a detog has happened, activate the failsafe variable
-        if (task[0].type === "detog") 
-            boal = true;
+        try {
+            // Toggle tasks have a "shrink" boolean, which keeps the iterator of
+            // this loop from incrementing, slightly shrinking the sort time.
+            if (task[0].type === "toggle") 
+                if (task[0].shrink === true) 
+                    i--;
+            // If a detog has happened, activate the failsafe variable
+            if (task[0].type === "detog") 
+                boal = true;
+        }
+        catch(error) {
+            
+        }
         // Remove the first item from the task list.
         task.shift();
         
     }
     // Render every pieslice from the visual data array.
     for (let j = 0; j < vdat.length; j++) {
-        ctx.beginPath();
-        ctx.fillStyle = cols[vdat[j]];
-        ctx.moveTo(cx, cy);
-        ctx.arc(cx, cy, radius, rotateA(j), rotateB(j), false);
-        ctx.lineTo(cx, cy);
-        ctx.fill();
+        slice(j, cols[vdat[j]]);
     }
     // Render every toggled location in the toggles array.
     for (let i = 0; i < togs.length; i++) {
-        ctx.beginPath();
-        ctx.fillStyle = "#000000";
-        ctx.moveTo(cx, cy);
-        ctx.arc(cx, cy, radius, rotateA(togs[i]), rotateB(togs[i]), false);
-        ctx.moveTo(cx, cy);
-        ctx.fill();
+        slice(togs[i], "#000000");
     }
     // Render the toggled location from the single-toggle variable
     if (sing >= 0) {
-        ctx.beginPath();
-        ctx.fillStyle = "#000000";
-        ctx.moveTo(cx, cy);
-        ctx.arc(cx, cy, radius, rotateA(sing), rotateB(sing), false);
-        ctx.moveTo(cx, cy);
-        ctx.fill();
+        slice(sing, "#000000");
     }
     // If a detog has been processed, force the toggle variables to clear.
     if (boal) cleartogs();
     // Draw again on the next animation frame.
     window.requestAnimationFrame(draw);
+}
+// Render a pieslice
+function slice(index, fill, cc = false) {
+    arc(cx, cy, radius, rotateA(index), rotateB(index), fill);
+}
+// Render an arc
+function arc(centerX, centerY, radius, rotateA, rotateB, fill, cc = false) {
+    ctx.beginPath();
+    ctx.fillStyle = fill;
+    ctx.moveTo(centerX, centerY);
+    ctx.arc(centerX, centerY, radius, rotateA, rotateB, cc);
+    ctx.moveTo(centerX, centerY);
+    ctx.fill();
 }
 // Process a task object.
 function process(obj) {
@@ -114,6 +185,7 @@ function process(obj) {
                 break;
             case "switch": // Switch tasks run new algorithms based on the mode
                 sing = -1; // Also clear potential toggles
+                tlast = task.length;
                 switch (mode.shift()) {
                     default:
                     case 0:
@@ -137,25 +209,26 @@ function process(obj) {
                     case 6:
                         quicksort();
                         break;
-					case 7:
-						heapsort();
-						break;
-					case 8:
-						oddeven();
-						break;
-					case 9:
-						gnome();
-						break;
-					case 10:
-						comb();
-						break;
-					case 11:
-						circle();
-						break;
-					case 12:
-						cycle();
-						break;
+                    case 7:
+			heapsort();
+			break;
+                    case 8:
+			oddeven();
+			break;
+                    case 9:
+			gnome();
+			break;
+                    case 10:
+			comb();
+			break;
+                    case 11:
+			circle();
+			break;
+                    case 12:
+			cycle();
+			break;
                 }
+                console.log((task.length - tlast) + " tasks added.");
                 break;
             case "report": // Report to the console and designated spot in the 
                            // document which algorithm is being run 
@@ -176,22 +249,24 @@ function process(obj) {
                 break;
         }
     } catch (error) { // Catch an error if there is no more tasks to process
-	console.log(error);
-        // Shuffle the array.
-        addMode(1);
-        detog();
-        // Momentarily wait.
-        addMode(0);
-        //addMode(12); /* For debugging specific algorithms */
-		// Sort the array with a random sorting algorithm.
-		var neu = prev;
-		do neu=2+Math.floor(Math.random()*sortcount);while(neu==prev);
-		prev = neu;
-        addMode(prev);
-        detog();
-        // Momentarily wait.
-        addMode(0);
-
+	if(error.name !== "TypeError") console.log(error);
+        else if(autosort) {
+            console.log("Adding new sorts...");
+            // Shuffle the array.
+            addMode(1);
+            detog();
+            // Momentarily wait.
+            addMode(0);
+            //addMode(12); /* For debugging specific algorithms */
+            // Sort the array with a random sorting algorithm.
+            var neu = prev;
+            do neu=2+Math.floor(Math.random()*sortcount);while(neu===prev);
+            prev = neu;
+            addMode(prev);
+            detog();
+            // Momentarily wait.
+            addMode(0);
+        }
     }
 }
 
@@ -402,8 +477,7 @@ function quicksort(low, high) {
         for (let j = low; j <= high - 1; j++) {
             if (data[j] < pivot) {
                 i++;
-                toggle(i, false);
-                toggle(j, false);
+                toggle(i, false); toggle(j, false);
                 swap(i, j);
                 detog();
             }
