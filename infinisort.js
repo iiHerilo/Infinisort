@@ -145,6 +145,8 @@ function build(amount, speed) {
 }
 // Draw a pie chart consisting of each point in the vdat array to the canvas.
 function draw() {
+    // Clear the main canvas before rendering anything.
+    ctx.clearRect(0, 0, getCanvasWidth(), getCanvasHeight());
 	// Get a boolean for detoggling failsafe.
 	boal = false;
 	// Repeat as many times as the speed calls for (adaptive depending on the 
@@ -182,6 +184,8 @@ function draw() {
 	if (boal) cleartogs();
         // Render everything in the aux pie.
         for(let i = 0; i < audt.length; i++) {
+            // Clear the context before rendering any slices.
+            if(i === 0 ) atx.clearRect(0, 0, getCanvasWidth(auxID), getCanvasHeight(auxID));
             slice(i, i === -1 ? "#000000" : cols[vdat[audt[i]]], false, atx, audt.length, aucx, aucy, aurad);
         }
         audt = [];
@@ -230,7 +234,6 @@ function process(obj) {
 				break;
 			case "report": // Report to the console and designated spot in the 
 				// document which algorithm is being run 
-				console.log(obj.sort);
 				document.getElementById(currentID).innerHTML = obj.sort;
 				break;
 			case "toggle": // Toggle a slice, making it appear selected
@@ -362,6 +365,7 @@ function auxmulti(arr, subtitle = "AUX") {
             for(let j = 0; j < arr[i].length; j++) {
                 f.push(arr[i][j]);
             }
+            //f.push(-1);
         }
         catch(err) {}
     }
@@ -410,6 +414,7 @@ function swap(a, b) {
 }
 // Add a report task
 function log(s) {
+    console.log("Log: " + s);
 	task.push({
 		type: "report",
 		sort: s
@@ -472,9 +477,9 @@ function selection() {
 				detog();
 				b = c;
 				toggle(b, true);
-                                aux(b,true,"Selection:");
+                                aux(data[b],true,"Selection:");
 			}
-			toggle(data[c], false, true);
+			toggle(c, false, true);
 
 		}
 		swap(b, a);
@@ -831,7 +836,7 @@ function lsd(base = -1) {
                         aux(buckets[i], false, "Bucket");
                         while(buckets[i].length !== 0) {
                             var u = buckets[i].shift();
-                            toggle(u, true);
+                            toggle(data[u], true);
                             toggle(index, false, true);
                             insert(index++, u);
                             if(sorted || ++tc > base / 2) {
@@ -839,7 +844,6 @@ function lsd(base = -1) {
                                 tc = 0;
                             }
                             auxmulti(buckets, "Buckets");
-                            console.log(buckets);
                         }
 			/*for (let j = 0; j < b.length; j++) {
 				toggle(b[j], true);
@@ -883,10 +887,8 @@ const funk = [
     comb,
     circle,
     cycle,
+    lsdany,
     lsdtwo,
     lsdfor,
-    lsdate,
-    lsdten,
-    lsdhex,
-    lsdtop
+    lsdten
 ];
