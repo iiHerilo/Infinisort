@@ -21,5 +21,5 @@
  10. Circle Sort
  11. Cycle Sort
  12. Radix LSD Sort
-    - Works with any base
-    - Presets are 2, 4, 8, 10, 16, and 32
+     - Works with any base
+     - Presets are 2, 4, 8, 10, 16, and 32
