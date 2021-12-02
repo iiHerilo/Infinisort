@@ -272,7 +272,7 @@ function process(obj) {
 			detog();
 			// Momentarily wait.
 			addMode(0);
-			//addMode(5); /* For debugging specific algorithms */
+			//addMode(13); /* For debugging specific algorithms */
                         //addNextMode();
 			addRandomMode();
 			detog();
@@ -283,8 +283,8 @@ function process(obj) {
 }
 function addRandomMode() {
     var neu = prev;
-    do do neu = 2 + Math.floor(Math.random() * sortcount); while (neu === prev);
-    while(exclude.includes(allfuncs[neu]))
+    do neu = 2 + Math.floor(Math.random() * sortcount); 
+    while (neu === prev || exclude.includes(allfuncs[neu]));
     prev = neu;
     addMode(prev);
     detog();
@@ -528,6 +528,23 @@ function bubble() {
 		a = b;
 	} while (a > 1);
 }
+function optbubble() {
+    log("Optimized Bubble Sort");
+    var swapped;
+    for(let i = 0; i < max; i++) {
+        swapped = false;
+        for(let j = 0; j < max-i-1; j++) {
+            if(data[j] > data[j+1]) {
+                swap(j, j+1);
+                swapped = true;
+                detog();
+                toggle(j, true);
+            }
+        }
+        if(!swapped) break;
+    }
+    detog();
+}
 
 function cocktail() {
 	log("Cocktail Shaker Sort");
@@ -606,19 +623,19 @@ function quicksort(mode = 0) {
 	var piv;
 	switch (mode) {
 		case 1:
-			piv = "Minimum Pivot";
+			piv = "Left";
 			break;
 		case 2:
-			piv = "Median Pivot";
+			piv = "Middle";
 			break;
 		case 3:
-			piv = "Random Pivot";
+			piv = "Random";
 			break;
 		default:
-			piv = "";
+			piv = "Right";
 			break;
 	}
-	log("Quicksort " + piv);
+	log("Quicksort " + piv + " Pivot");
 	quick(0, max - 1);
 	detog();
 }
@@ -627,6 +644,102 @@ function qsmin() {quicksort(1);}
 function qsmed() {quicksort(2);}
 function qsran() {quicksort(3);}
 function qsany() {quicksort(-1);}
+
+function qsdual() {
+    log("Quicksort Dual Pivot")
+    function partition(low, high) {
+        if(data[low] > data[high]) swap(low, high);
+        var j = low + 1;
+        var g = high - 1;
+        var k = low + 1;
+        var p = data[low];
+        var q = data[high];
+        
+        aux([low, high], false, "Pivots");
+        
+        while(k <= g) {
+            detog();
+            toggle(j, true);
+            toggle(g);
+            toggle(k, true);
+            if(data[k] < p) {
+                swap(k, j);
+                j++;
+            }
+            else if(data[k] >= q) {
+                while(data[g] > q && k < g) 
+                    g--;
+                swap(k, g);
+                g--;
+                if(data[k] < p) {
+                    swap(k, j);
+                    j++;
+                }
+            }
+            k++;
+        }
+        j--;
+        g++;
+        
+        swap(low, j);
+        swap(high, g);
+        
+        return [j, g];
+    }
+    function quick(low, high) {
+        if(low < high) {
+            var piv = partition(low, high);
+            
+            quick(low, piv[0]-1);
+            quick(piv[0]+1, piv[1]-1);
+            quick(piv[1]+1,high);
+        }
+    }
+    quick(0, max);
+    detog();
+}
+function qstable() {
+    log("Stable Quicksort");
+    function quick(arr) {
+        if(arr.length <= 1) return arr;
+        else {
+            var mid = Math.floor(arr.length/2);
+            var piv = arr[mid];
+            
+            var sml = [], grt = [];
+            
+            for(let i = 0; i < arr.length; i++) {
+                detog();
+                toggle(i);
+                var val = arr[i];
+                toggle(val, true);
+                if(val < piv) 
+                    sml.push(val);
+                else 
+                    grt.push(val);
+                auxmulti([sml, grt]);
+            }
+            
+            var ans = [];
+            var lft = quick(sml);
+            var rgt = quick(grt);
+            var j = 0;
+            for(let i = 0; i < lft.length; i++) {
+                ans.add(lft[i]);
+                insert(j++, lft[i]);
+            }
+            ans.add(piv);
+            insert(j++, piv);
+            for(let i = 0; i < rgt.length; i++) {
+                ans.add(rgt[i]);
+                insert(j++, rgt[i]);
+            }
+            return ans;
+    }
+    }
+    quick(data);
+    detog();
+}
 
 function heapsort(b = true) {
 	function heap(n, i, b = true) {
@@ -886,12 +999,15 @@ const allfuncs = [
     selection,
     insertion,
     bubble,
+    optbubble,
     cocktail,
     qsany,
     qsmax,
     qsmin,
     qsmed,
     qsran,
+    qsdual,
+    qstable,
     maxheap,
     minheap,
     oddeven,
@@ -910,6 +1026,7 @@ const allfuncs = [
 const exclude = [
     qsany,
     anyheap,
+    qstable,
     lsdate,
     lsdhex,
     lsdtop
