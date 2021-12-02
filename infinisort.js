@@ -11,6 +11,7 @@ var max;
 var spd;
 var cx;
 var cy;
+var im = 0;
 var aucx;
 var aucy;
 var aurad;
@@ -31,7 +32,7 @@ var mode; // Queue of modes
 var togs; // All toggled slice positions
 var sing; // Seperate single toggle position.
 function init(amount, speed) {
-    sortcount = funk.length;
+    sortcount = allfuncs.length;
 	ctx = document.getElementById(canvasID).getContext('2d');
         atx = document.getElementById(auxID).getContext('2d');
 	clearTasks();
@@ -227,7 +228,7 @@ function process(obj) {
 						shuffle();
 						break;
                                         default:
-                                            funk[sp-2]();
+                                            allfuncs[sp-2]();
                                                 
 				}
 				console.log((task.length - tlast) + " tasks added.");
@@ -271,17 +272,26 @@ function process(obj) {
 			detog();
 			// Momentarily wait.
 			addMode(0);
-			//addMode(14); /* For debugging specific algorithms */
-			// Sort the array with a random sorting algorithm.
-			var neu = prev;
-			do neu = 2 + Math.floor(Math.random() * sortcount); while (neu === prev);
-			prev = neu;
-			addMode(prev);
+			//addMode(5); /* For debugging specific algorithms */
+                        //addNextMode();
+			addRandomMode();
 			detog();
 			// Momentarily wait.
 			addMode(0);
 		}
 	}
+}
+function addRandomMode() {
+    var neu = prev;
+    do do neu = 2 + Math.floor(Math.random() * sortcount); while (neu === prev);
+    while(exclude.includes(allfuncs[neu]))
+    prev = neu;
+    addMode(prev);
+    detog();
+}
+function addNextMode() {
+    addMode(2 + im++);
+    im = im >= allfuncs.length ? 0 : im;
 }
 
 // Get the rotations of various parts of a given slice position
@@ -655,6 +665,7 @@ function heapsort(b = true) {
 }
 function maxheap() {heapsort(true);}
 function minheap() {heapsort(false);}
+function anyheap() {heapsort(Math.random() * 2 > 1);}
 
 function oddeven() {
 	log("Odd-Even Sort");
@@ -871,11 +882,12 @@ function lsdhex() {lsd(16);}
 function lsdtop() {lsd(32);}
 
 
-const funk = [
+const allfuncs = [
     selection,
     insertion,
     bubble,
     cocktail,
+    qsany,
     qsmax,
     qsmin,
     qsmed,
@@ -890,5 +902,15 @@ const funk = [
     lsdany,
     lsdtwo,
     lsdfor,
-    lsdten
+    lsdate,
+    lsdten,
+    lsdhex,
+    lsdtop
+];
+const exclude = [
+    qsany,
+    anyheap,
+    lsdate,
+    lsdhex,
+    lsdtop
 ];
