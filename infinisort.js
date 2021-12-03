@@ -272,7 +272,7 @@ function process(obj) {
 			detog();
 			// Momentarily wait.
 			addMode(0);
-			//addMode(13); /* For debugging specific algorithms */
+			//addMode(3); /* For debugging specific algorithms */
                         //addNextMode();
 			addRandomMode();
                         detog();
@@ -487,7 +487,7 @@ function selection() {
 				detog();
 				b = c;
 				toggle(b, true);
-                                aux(data[b],true,"Selection:");
+                                aux(b,true,"Selection");
 			}
 			toggle(c, false, true);
 
@@ -495,6 +495,41 @@ function selection() {
 		swap(b, a);
 		detog();
 	}
+}
+function dualselect() {
+    log("Dual Selection Sort");
+    for(let i = 0, j = max - 1; i < j; i++, j--) {
+        detog();
+        toggle(i, true);
+        toggle(j, true);
+        var minv = data[i];
+        var maxv = data[i];
+        var mini = i;
+        var maxi = i;
+        
+        for(var k = i; k <= j; k++) {
+            toggle(k, false, true);
+            if(data[k] > maxv) {
+                maxv = data[k];
+                maxi = k;
+            }
+            else if(data[k] < minv) {
+                minv = data[k];
+                mini = k;
+            }
+            detog();
+            toggle(mini, true);
+            toggle(maxi, true);
+            aux([mini,maxi], false, "Selections")
+        }
+        swap(i, mini);
+        if(data[mini] == maxv) {
+            swap(j, mini);
+        }
+        else {
+            swap(j, maxi);
+        }
+    }
 }
 
 function insertion() {
@@ -1031,6 +1066,7 @@ function lsdtop() {lsd(32);}
 
 const allfuncs = [
     selection,
+    dualselect,
     insertion,
     bubble,
     optbubble,
