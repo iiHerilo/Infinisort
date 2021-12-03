@@ -272,7 +272,7 @@ function process(obj) {
 			detog();
 			// Momentarily wait.
 			addMode(0);
-			//addMode(18); /* For debugging specific algorithms */
+			//addMode(13); /* For debugging specific algorithms */
                         //addNextMode();
 			addRandomMode();
                         detog();
@@ -699,45 +699,64 @@ function qsdual() {
     detog();
 }
 function qstable() {
+    // i know this code looks bad this took me forever to do
     log("Stable Quicksort");
-    function quick(arr) {
-        if(arr.length <= 1) return arr;
-        else {
-            var mid = Math.floor(arr.length/2);
+    function quick(arr, low, high) {
+        try {
+            if(arr === []) return arr;
+            if(arr.length <= 1) return arr;
+            arr[1];
+        }
+        catch(error) {return arr;}
+            var mid = Math.floor(arr.length/2.0);
             var piv = arr[mid];
-            
             var sml = [], grt = [];
             
             for(let i = 0; i < arr.length; i++) {
                 detog();
-                toggle(i);
+                toggle(low + i);
                 var val = arr[i];
                 toggle(val, true);
                 if(val < piv) 
                     sml.push(val);
-                else 
+                else if (val > piv)
                     grt.push(val);
-                auxmulti([sml, grt]);
+                auxmulti([sml, grt], "Partitions");
             }
             
             var ans = [];
-            var lft = quick(sml);
-            var rgt = quick(grt);
-            var j = 0;
-            for(let i = 0; i < lft.length; i++) {
-                ans.add(lft[i]);
-                insert(j++, lft[i]);
+            var s1 = sml.slice();
+            var g1 = grt.slice();
+            var lft = [];
+            var rgt = [];
+            
+            var j = low;
+            for(let i = 0; i < sml.length; i++) {
+                toggle(j, true, true);
+                insert(j++, sml[i]);
+                s1.shift();
+                auxmulti([s1,g1], "Partitions");
             }
-            ans.add(piv);
             insert(j++, piv);
-            for(let i = 0; i < rgt.length; i++) {
-                ans.add(rgt[i]);
-                insert(j++, rgt[i]);
+            for(let i = 0; i < grt.length; i++) {
+                toggle(j, true, true);
+                insert(j++, grt[i]);
+                g1.shift();
+                auxmulti([s1,g1], "Partitions");
             }
+            if(sml.length > 1) {lft = quick(sml, low, sml.length);}
+                for(let i = 0; i < lft.length; i++) {
+                    ans.push(lft[i]);
+                }
+            ans.push(piv);
+            if(grt.length > 1) {rgt = quick(grt, low + sml.length + 1, high);}
+                for(let i = 0; i < rgt.length; i++) {
+                    ans.push(rgt[i]);
+                }
+            
             return ans;
     }
-    }
-    quick(data);
+    quick(data, 0, max);
     detog();
 }
 
@@ -1042,7 +1061,6 @@ const allfuncs = [
 const exclude = [
     qsany,
     anyheap,
-    qstable,
     lsdate,
     lsdhex,
     lsdtop
