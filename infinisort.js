@@ -272,10 +272,10 @@ function process(obj) {
 			detog();
 			// Momentarily wait.
 			addMode(0);
-			//addMode(13); /* For debugging specific algorithms */
+			//addMode(18); /* For debugging specific algorithms */
                         //addNextMode();
 			addRandomMode();
-			detog();
+                        detog();
 			// Momentarily wait.
 			addMode(0);
 		}
@@ -821,6 +821,21 @@ function gnome() {
 	}
 	detog();
 }
+function optgnome() {
+    log("Optimized Gnome Sort");
+    function gno(bound) {
+        for(let i = bound; i > 0 && data[i-1]>data[i]; i--) {
+            toggle(bound, true);
+            swap(i-1, i);
+            toggle(i-1, false, true);
+        } 
+    }
+    for(let i = 0; i < max; i++) {
+        toggle(i);
+        gno(i);
+        detog();
+    }
+}
 
 function comb() {
 	log("Comb Sort");
@@ -1012,6 +1027,7 @@ const allfuncs = [
     minheap,
     oddeven,
     gnome,
+    optgnome,
     comb,
     circle,
     cycle,
