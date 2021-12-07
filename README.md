@@ -4,22 +4,20 @@
  
 # Available algorithms:
  - Selection Sort
- - Dual Selection Sort*
+ - Dual Selection Sort
  - Insertion Sort
  - Bubble Sort
- - Optimized Bubble Sort*
+ - Optimized Bubble Sort
  - Cocktail Shaker Sort
  - Quicksort
- - Quicksort Dual Pivot*
- - Stable Quicksort*
+ - Quicksort Dual Pivot
+ - Stable Quicksort
  - Max Heap Sort
  - Min Heap Sort
  - Odd-Even Sort
  - Gnome Sort
- - Optimized Gnome Sort*
+ - Optimized Gnome Sort
  - Comb Sort
  - Circle Sort
  - Cycle Sort
  - Radix LSD Sort
-
- - \*to be added
