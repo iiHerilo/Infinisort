@@ -9,10 +9,7 @@
  - Bubble Sort
  - Optimized Bubble Sort*
  - Cocktail Shaker Sort
- - Quicksort Right Pivot
- - Quicksort Left Pivot
- - Quicksort Median Pivot
- - Quicksort Random Pivot
+ - Quicksort
  - Quicksort Dual Pivot*
  - Stable Quicksort*
  - Max Heap Sort
