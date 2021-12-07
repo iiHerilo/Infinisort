@@ -21,4 +21,4 @@
  - Circle Sort
  - Cycle Sort
  - Radix LSD Sort
- \* TO BE ADDED
+ \n \* TO BE ADDED
