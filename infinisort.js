@@ -20,7 +20,8 @@ var debug = {
     show_aux: true,
     tpf: 0,
     tasks_left: 0,
-    auto_mode: "random",
+   //auto_mode: "random",
+    auto_mode: "in",
     enable_repeats: false,
     enable_b2bs: false,
     disable_toggles: false
@@ -286,7 +287,7 @@ function process(obj) {
         else if(debug.auto_mode === "random")
             addRandomMode();
         else
-            addSort(21)
+            addSort(27)
         detog();
         addMode(0);
         //addMode(3); /* For debugging specific algorithms */
@@ -512,10 +513,12 @@ function reverse(asMode = true) {
   detog();
 }
 function verify() {
+    detog();
     while(data.length > max) data.pop();
     for(let i = 0; i < max; i++) {
-        insert(i, i+1);
         toggle(i, false, true);
+        insert(i, i+1);
+        hop(i % 2 === 0 ? 0 : -1);
     }
     
 }
@@ -980,13 +983,15 @@ function gnome() {
   var i = 0;
   while (i < max) {
       //console.log(data.length);
-    toggle(i, false, true);
+    
     if (i === 0 || data[i] >= data[i - 1]) {
         //console.log("incing " + i)
+        toggle(i, false, true);
       i++;
       aux(data[i], true, "Comparison");
     } else {
         //console.log("decing " + i)
+        toggle(i, true, true);
       swap(i, i - 1);
       i--;
       aux([data[i], data[i - 1]], false, "Comparison");
@@ -1204,6 +1209,30 @@ function lsdtop() {
   lsd(32);
 }
 
+function shell() {
+    log("Shell Sort");
+    var n = max;
+    
+    for(let gap = Math.floor(n/2); gap > 0; gap = Math.floor(gap/2)) {
+        
+        for(let i = gap; i < n; i++) {
+            detog();
+            toggle(i, false, false);
+            var temp = data[i];
+            let j;
+            for(j = i; j >= gap && data[j - gap] > temp; j -= gap) {
+                insert(j, data[j - gap]);
+                //detog();
+                toggle(j, true, false);
+                //toggle(data[j-gap]);
+                toggle(j-gap);
+            }
+            insert(j, temp);
+        }
+    }
+    detog();
+}
+
 
 const allfuncs = [
   selection,
@@ -1232,7 +1261,8 @@ const allfuncs = [
   lsdate,
   lsdten,
   lsdhex,
-  lsdtop
+  lsdtop,
+  shell
 ];
 const exclude = [
   qsany,
