@@ -1,10 +1,33 @@
-// The ID of the canvas objcet which will hold the visualizer
-const canvasID = 'canv';
-const auxID = 'auxc';
 // The radius of the circle (should be relative to canvas height &/or width
 const rTolerance = 5;
-const currentID = 'current';
-const subID = 'asub';
+
+const ID = {
+    main: 'maincanv',
+    aux: 'auxcanv',
+    current: 'current',
+    auxsub: 'auxsub',
+    ver: 'version',
+    auxzone: 'auxiliary',
+    debug: 'debugmnu',
+    title: 'title',
+    copyright: 'copyright'
+};
+
+var debug = {
+    version: "v1.0.6-DEV",
+    enabled: false,
+    show_globals: false,
+    show_aux: true,
+    tpf: 0,
+    tasks_left: 0,
+    auto_mode: "random",
+    enable_repeats: false,
+    enable_b2bs: false,
+    disable_toggles: false
+};
+function toggleDebug() {
+    debug.enabled = !debug.enabled;
+}
 
 var sortcount;
 var max;
@@ -33,13 +56,14 @@ var togs; // All toggled slice positions
 var sing; // Seperate single toggle position.
 function init(amount, speed) {
   sortcount = allfuncs.length;
-  ctx = document.getElementById(canvasID).getContext('2d');
-  atx = document.getElementById(auxID).getContext('2d');
+  getElement(ID.ver).innerHTML = debug.version;
+  ctx = getElement(ID.main).getContext('2d');
+  atx = getElement(ID.aux).getContext('2d');
   clearTasks();
-  setRadius(getCanvasWidth(canvasID) / 2);
-  setAuxRadius(getCanvasWidth(auxID) / 2);
-  aucx = getCanvasWidth(auxID) / 2;
-  aucy = getCanvasHeight(auxID) / 2;
+  setRadius(getCanvasWidth(ID.canv) / 2);
+  setAuxRadius(getCanvasWidth(ID.aux) / 2);
+  aucx = getCanvasWidth(ID.aux) / 2;
+  aucy = getCanvasHeight(ID.aux) / 2;
   build(amount, speed);
 }
 
@@ -50,6 +74,10 @@ function setRadius(rad) {
 function setAuxRadius(rad) {
   aurad = rad - rTolerance;
 }
+
+function getElement(id) {
+    return document.getElementById(id);
+} 
 
 function clearTasks() {
   task = [];
@@ -70,12 +98,12 @@ function setSpeed(speed) {
   spd = speed;
 }
 
-function getCanvasWidth(id = canvasID) {
-  return document.getElementById(id).getAttributeNode('width').value;
+function getCanvasWidth(id = ID.main) {
+  return getElement(id).getAttributeNode('width').value;
 }
 
-function getCanvasHeight(id = canvasID) {
-  return document.getElementById(id).getAttributeNode('height').value;
+function getCanvasHeight(id = ID.main) {
+  return getElement(id).getAttributeNode('height').value;
 }
 
 
@@ -95,42 +123,6 @@ function setAutoSort(bool) {
   autosort = bool;
 }
 
-function help() {
-  s = [
-    "init(amount, speed)   - Initialize the infinisort.",
-    "setRadius(rad)        - Set the radius of the color circle.",
-    "clearTasks()          - Clear all animation tasks & associated variables.",
-    "clearData()           - Clear all data, including visual and color data.",
-    "setSpeed(speed)       - Set the speed of the animation.",
-    "getCanvasWidth()      - Get the width of the canvas object.",
-    "getCanvasHeight()     - Get the height of the canvas object.",
-    "fillData()            - Fill the data arrays with numbers.",
-    "help()                - Display a list of commands.",
-    "build(amount, speed)  - Build a circle with the given parameters.",
-    "draw()                - Render the next few animation tasks.",
-    "process(obj)          - Processes a task.",
-    "rotateA(index)        - Get the first rotation of a given slice.",
-    "rotateB(index)        - Get the last rotation of a given slice.",
-    "theta()               - Get the angle of each slice.",
-    "rgb()                 - Get the maximum value a color channel can have.",
-    "color(n)              - Get the color of the nth slice.",
-    "addSwitch()           - Add a switch task.",
-    "addMode(a)            - Add a mode change.",
-    "toggle(index, shrink) - Add a toggle task.",
-    "detog()               - Add a detoggle task.",
-    "cleartogs()           - Clear all toggle variables.",
-    "swap(a, b)            - Swap two points in the data array, then add a swap task.",
-    "log(s)                - Add a report task.",
-    "halt(length)          - Add a certain number of wait tasks."
-  ];
-  s.sort();
-  h = "List of valid commands:";
-  for (let i = 0; i < s.length; i++) {
-    h += "\n" + s[i];
-  }
-  console.log(h);
-}
-
 function build(amount, speed) {
   // Set the number of items & the visualization speed
   max = amount;
@@ -147,6 +139,7 @@ function build(amount, speed) {
 }
 // Draw a pie chart consisting of each point in the vdat array to the canvas.
 function draw() {
+  debug.tpf = 0;
   // Clear the main canvas before rendering anything.
   ctx.clearRect(0, 0, getCanvasWidth(), getCanvasHeight());
   // Get a boolean for detoggling failsafe.
@@ -154,18 +147,25 @@ function draw() {
   // Repeat as many times as the speed calls for (adaptive depending on the 
   // number of items.)
   for (let i = 0; i < (spd * Math.ceil(max / 250)); i++) {
+      debug.tpf++;
     // Process the first task in the array.
     process(task[0]);
     try {
+        if(task[0].type === "toggle" && debug.disable_toggles)
+            i--;
       // Toggle tasks have a "shrink" boolean, which keeps the iterator of
       // this loop from incrementing, slightly shrinking the sort time.
-      if (task[0].type === "aux" || (task[0].type === "toggle" && task[0].shrink))
+      if (task[0].type === "aux" || (task[0].type === "toggle" && (!debug.disable_toggles) && task[0].shrink ))
         i--;
       // If a detog has happened, activate the failsafe variable
       if (task[0].type === "detog")
         boal = true;
+      if (task[0].type === "hop") {
+        i -= task[0].length;
+        //console.log(i + " hop f " + task[0].length)
+            }
     } catch (error) {
-
+        console.log(error);
     }
     // Remove the first item from the task list.
     task.shift();
@@ -175,11 +175,11 @@ function draw() {
     slice(j, cols[vdat[j]]);
   }
   // Render every toggled location in the toggles array.
-  for (let i = 0; i < togs.length; i++) {
+  for (let i = 0; i < togs.length && (!debug.disable_toggles); i++) {
     slice(togs[i], "#000000");
   }
   // Render the toggled location from the single-toggle variable
-  if (sing >= 0) {
+  if (sing >= 0 && (!debug.disable_toggles)) {
     slice(sing, "#000000");
   }
   // If a detog has been processed, force the toggle variables to clear.
@@ -187,10 +187,11 @@ function draw() {
   // Render everything in the aux pie.
   for (let i = 0; i < audt.length; i++) {
     // Clear the context before rendering any slices.
-    if (i === 0) atx.clearRect(0, 0, getCanvasWidth(auxID), getCanvasHeight(auxID));
+    if (i === 0) atx.clearRect(0, 0, getCanvasWidth(ID.aux), getCanvasHeight(ID.aux));
     slice(i, i === -1 ? "#000000" : cols[vdat[audt[i]]], false, atx, audt.length, aucx, aucy, aurad);
   }
   audt = [];
+  while(vdat.length > max) vdat.pop();
   // Draw again on the next animation frame.
   window.requestAnimationFrame(draw);
 }
@@ -229,14 +230,19 @@ function process(obj) {
             shuffle();
             break;
           default:
-            allfuncs[sp - 2]();
+			if(sp > 0) {
+				allfuncs[sp - 2]();
+			}
 
         }
         //console.log((task.length - tlast) + " tasks added.");
         break;
       case "report": // Report to the console and designated spot in the 
         // document which algorithm is being run 
-        document.getElementById(currentID).innerHTML = obj.sort;
+        setCurrentText(obj.sort);
+		if(obj.sort !== "Shuffling...") {
+			console.log("Playing " + obj.sort);
+		}
         break;
       case "toggle": // Toggle a slice, making it appear selected
         if (obj.single)
@@ -251,7 +257,7 @@ function process(obj) {
         vdat[obj.index] = obj.value;
         break;
       case "aux":
-        document.getElementById(subID).innerHTML = obj.text;
+        getElement(ID.auxsub).innerHTML = obj.text;
         if (obj.sing) {
           audt = [];
           audt.push(obj.index);
@@ -263,18 +269,22 @@ function process(obj) {
         break;
     }
   } catch (error) { // Catch an error if there is no more tasks to process
-    console.log(error);
-    if (error.name !== "TypeError") console.log(error);
+    //console.log(error);
+    if (error.message != "Cannot read properties of undefined (reading 'type')") console.log(error);
     else if (autosort) {
       console.log("Adding new sorts...");
-      document.getElementById(currentID).innerHTML = "Adding new sorts...";
-
+      setCurrentText("Adding new sorts...");
+	  applied = [];
       for (let i = 0; i < 10; i++) {
         addMode(1);
         detog();
         addMode(0);
-        //addNextMode();
-        addRandomMode();
+        if(debug.auto_mode === "ordered")
+            addNextMode();
+        else if(debug.auto_mode === "random")
+            addRandomMode();
+        else
+            addMode(5);
         detog();
         addMode(0);
         //addMode(3); /* For debugging specific algorithms */
@@ -285,12 +295,17 @@ function process(obj) {
   }
 }
 
+function update() {
+    
+}
+
 function addRandomMode() {
   var neu = prev;
-  do neu = 2 + Math.floor(Math.random() * sortcount);
-  while (neu === prev || exclude.includes(allfuncs[neu]));
+  do neu = Math.floor(Math.random() * sortcount);
+  while (neu === prev || exclude.includes(allfuncs[neu]) || applied.includes(neu));
   prev = neu;
-  addMode(prev);
+  addMode(prev+2);
+  if(debug.enable_repeats) applied.push(neu);
   detog();
 }
 
@@ -350,6 +365,9 @@ function ns(s) {
       return ns(s.substr(0, 1));
   }
 }
+function setCurrentText(s) {
+     getElement(ID.current).innerHTML = s;
+}
 
 // Add a switch task
 function addSwitch() {
@@ -371,12 +389,14 @@ function aux(index, single, subtitle = "AUX") {
   } catch (error) {
     f[0] = index;
   }
-  task.push({
-    type: "aux",
-    index: f,
-    sing: single,
-    text: subtitle
-  });
+  if(debug.show_aux) {
+    task.push({
+        type: "aux",
+        index: f,
+        sing: single,
+        text: subtitle
+    });
+  }
 }
 
 function auxmulti(arr, subtitle = "AUX") {
@@ -412,10 +432,10 @@ function cleartogs() {
   togs = [];
   sing = -1;
 }
-// I might use this later idk
-function skip(length) {
+// Boost or throttle a frame's animation count by a number of tasks.
+function hop(length = 1) {
   task.push({
-    type: "skip",
+    type: "hop",
     length: length
   });
 }
@@ -434,7 +454,8 @@ function swap(a, b) {
 }
 // Add a report task
 function log(s) {
-  console.log("Log: " + s);
+    while(vdat.length > max) vdat.pop();
+  if(s !== "Shuffling...") console.log("Running " + s);
   task.push({
     type: "report",
     sort: s
@@ -499,7 +520,7 @@ function selection() {
         toggle(b, true);
         aux(b, true, "Selection");
       }
-      toggle(c, false, true);
+      toggle(c, !(c % 4 === 1), true);
 
     }
     swap(b, a);
@@ -519,7 +540,7 @@ function dualselect() {
     var maxi = i;
 
     for (var k = i; k <= j; k++) {
-      toggle(k, false, true);
+      toggle(k, !(k % 3 == 2), true);
       if (data[k] > maxv) {
         maxv = data[k];
         maxi = k;
@@ -533,7 +554,7 @@ function dualselect() {
       aux([mini, maxi], false, "Selections")
     }
     swap(i, mini);
-    if (data[mini] == maxv) {
+    if (data[mini] === maxv) {
       swap(j, mini);
     } else {
       swap(j, maxi);
@@ -549,7 +570,7 @@ function insertion() {
       swap(b, b - 1);
       detog();
       toggle(b, true);
-      aux([data[b - 1], data[b]], false, "Comparison");
+      aux([b - 1, b], false, "Comparison");
     }
   }
   detog();
@@ -564,6 +585,8 @@ function bubble() {
     for (c = 1; c < a; c++) {
       if (data[c - 1] > data[c]) {
         swap(c - 1, c);
+        hop((c % 3 === 0 ? 0 : 3));
+        //console.log("c%3=" + c%3 + " so hop " + (c % 3 === 0 ? 0 : 1))
         detog();
         b = c;
         toggle(c, true);
@@ -581,6 +604,7 @@ function optbubble() {
     for (let j = 0; j < max - i - 1; j++) {
       if (data[j] > data[j + 1]) {
         swap(j, j + 1);
+        hop((j % 3 === 0 ? 0 : 3));
         swapped = true;
         detog();
         toggle(j, true);
@@ -604,6 +628,7 @@ function cocktail() {
       if (data[i] > data[i + 1]) {
         swapped = true;
         swap(i, i + 1);
+        hop((i % 3 === 0 ? 0 : 3));
         detog();
         toggle(i, true);
       }
@@ -614,6 +639,7 @@ function cocktail() {
       if (data[i] > data[i + 1]) {
         swapped = true;
         swap(i, i + 1);
+        hop((i % 3 === 0 ? 0 : 3));
         detog();
         toggle(i, true);
       }
@@ -720,9 +746,9 @@ function qsdual() {
 
     while (k <= g) {
       detog();
-      toggle(j, true);
+      toggle(j, false);
       toggle(g);
-      toggle(k, true);
+      toggle(k, false);
       if (data[k] < p) {
         swap(k, j);
         j++;
@@ -875,6 +901,41 @@ function minheap() {
 
 function anyheap() {
   heapsort(Math.random() * 2 > 1);
+}
+
+function ternheap() {
+    log("Ternary Heap Sort");
+    function heap(i, n) {
+        var top;
+        var l = 3 * i + 1;
+        var m = 3 * i + 2;
+        var r = 3 * i + 3;
+        if(l < n && data[l] > data[i]) 
+            top = l;
+        else 
+            top = i;
+        if(m < n && data[m] > data[top])
+            top = m;
+        if(r < n && data[r] > data[top])
+            top = r;
+        detog();
+        toggle(l);
+        toggle(m);
+        toggle(r);
+        toggle(i);
+        if(top !== i) {
+            swap(i, top);
+            heap(top, n);
+        }
+    }
+    for(let i = Math.floor(max/3); i >= 0; i--)
+        heap(i, max);
+    var n = max;
+    for(let i = n-1; i > 0; i--) {
+        swap(0, i);
+        heap(0, --n);
+    }
+    detog();
 }
 
 function oddeven() {
@@ -1136,7 +1197,6 @@ const allfuncs = [
   bubble,
   optbubble,
   cocktail,
-  qsany,
   qsmax,
   qsmin,
   qsmed,
@@ -1145,13 +1205,13 @@ const allfuncs = [
   qstable,
   maxheap,
   minheap,
+  ternheap,
   oddeven,
   gnome,
   optgnome,
   comb,
   circle,
   cycle,
-  lsdany,
   lsdtwo,
   lsdfor,
   lsdate,
@@ -1163,6 +1223,8 @@ const exclude = [
   qsany,
   anyheap,
   lsdate,
+  lsdtwo,
   lsdhex,
   lsdtop
 ];
+var applied = [];
