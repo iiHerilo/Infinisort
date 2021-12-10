@@ -5,20 +5,20 @@
         <title>Infinisort</title>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <script type="text/javascript" src="infinisort.js"></script>
+        <script src="infinisort.js"></script>
     </head>
     <body onload="init(150, 5)">
         <div style="text-align:center;">
-            <h1 style="text-align:center;">Infinisort</h1>
-            <p style="text-align:center;">Herilo © 2021</p>
+            <h1 id="title" style="text-align:center;">Infinisort</h1>
+            <p id="copyright" style="text-align:center;">© 2021 Herilo  <span id="version">v0.0.0</span></p>
             <h3 id="current" style="text-align:center;">
                 ...
             </h3>
-            <canvas id="canv" width="900" height="900"> </canvas>
+            <canvas id="maincanv" width="900" height="900"> </canvas>
             <br>
             <div id="auxiliary">
-                <span id="asub">AUX:</span><br>
-                <canvas id="auxc" width="100" height="100"> </canvas>
+                <span id="auxsub">AUX:</span><br>
+                <canvas id="auxcanv" width="100" height="100"> </canvas>
             </div>
         </div>
         
