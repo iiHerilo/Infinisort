@@ -232,6 +232,8 @@ function process(obj) {
           default:
 			if(sp > 0) {
 				allfuncs[sp - 2]();
+                                verify();
+    detog();
 			}
 
         }
@@ -284,7 +286,7 @@ function process(obj) {
         else if(debug.auto_mode === "random")
             addRandomMode();
         else
-            addMode(5);
+            addSort(21)
         detog();
         addMode(0);
         //addMode(3); /* For debugging specific algorithms */
@@ -298,19 +300,23 @@ function process(obj) {
 function update() {
     
 }
+function addSort(mode) {
+    addMode(mode+2);
+    
+}
 
 function addRandomMode() {
   var neu = prev;
   do neu = Math.floor(Math.random() * sortcount);
   while (neu === prev || exclude.includes(allfuncs[neu]) || applied.includes(neu));
   prev = neu;
-  addMode(prev+2);
-  if(debug.enable_repeats) applied.push(neu);
+  addSort(prev);
+  if(!debug.enable_repeats) applied.push(neu);
   detog();
 }
 
 function addNextMode() {
-  addMode(2 + im++);
+  addSort(im++);
   im = im >= allfuncs.length ? 0 : im;
 }
 
@@ -454,8 +460,7 @@ function swap(a, b) {
 }
 // Add a report task
 function log(s) {
-    while(vdat.length > max) vdat.pop();
-  if(s !== "Shuffling...") console.log("Running " + s);
+  if(s !== "Shuffling...") console.log("Animating " + s);
   task.push({
     type: "report",
     sort: s
@@ -505,6 +510,14 @@ function reverse(asMode = true) {
     toggle(max - i - 1);
   }
   detog();
+}
+function verify() {
+    while(data.length > max) data.pop();
+    for(let i = 0; i < max; i++) {
+        insert(i, i+1);
+        toggle(i, false, true);
+    }
+    
 }
 // Sort Via Selection Sort.
 function selection() {
@@ -966,11 +979,14 @@ function gnome() {
   log("Gnome Sort");
   var i = 0;
   while (i < max) {
+      //console.log(data.length);
     toggle(i, false, true);
     if (i === 0 || data[i] >= data[i - 1]) {
+        //console.log("incing " + i)
       i++;
       aux(data[i], true, "Comparison");
     } else {
+        //console.log("decing " + i)
       swap(i, i - 1);
       i--;
       aux([data[i], data[i - 1]], false, "Comparison");
@@ -1074,39 +1090,48 @@ function cycle() {
         if (arr[i] < arr[item]) {
           detog();
           pos++;
-          toggle(pos, i % 2 != 0);
+          toggle(pos, i % 2 !== 0);
         }
-      if (pos == cycle_start)
+      if (pos === cycle_start)
         continue;
-      while (arr[item] == arr[pos])
-        pos += 1;
-      if (pos != cycle_start)
+      while (arr[item] === arr[pos]) {
+       
+              pos += 1;
+      }
+      if (pos !== cycle_start)
         swap(pos, item);
-      while (pos != cycle_start) {
+    var l = -1;
+      while (pos !== cycle_start) {
+          
         pos = cycle_start;
         for (let i = cycle_start + 1; i < n; i++)
           if (arr[i] < arr[item]) {
             detog();
             pos += 1;
-            toggle(pos, i % 4 != 0);
+            toggle(pos, i % 4 !== 0);
           }
-        while (item == arr[pos])
-          pos += 1;
-        if (item != arr[pos])
+        while (item === arr[pos]) {
+            
+          
+                  pos++;
+        }
+        if (item !== arr[pos])
           swap(pos, item);
-
+          if(pos === l) {console.log("breakout!");break;}
+                  l = pos;
       }
     }
   }
   cycleSort(data, max);
   detog();
+ 
 }
 
 function lsd(base = -1) {
   if (base == -1) {
-    base = Math.pow(2, Math.round(Math.random() * 5) + 1);
+    base = Math.pow(2, Math.round(Math.random() * 4) + 1);
   }
-  if (base > 32) base = 10;
+  if (base > 16) base = 10;
   log("Radix LSD Sort Base " + base);
   var buckets = [];
 
@@ -1120,7 +1145,7 @@ function lsd(base = -1) {
 
     sorted = true;
     for (i = 0; i < max; i++) {
-      toggle(i);
+      toggle(i, false);
       var b = Math.floor(Math.floor((data[i] / expo)) % base);
       if (b > 0) sorted = false;
       buckets[b].push(i);
@@ -1128,33 +1153,23 @@ function lsd(base = -1) {
       auxmulti(buckets, "Buckets");
     }
     expo *= base;
-    var index = 0;
-    var tc = 0;
-    for (var i = 0; i < buckets.length; i++) {
-      aux(buckets[i], false, "Bucket");
-      while (buckets[i].length !== 0) {
-        var u = buckets[i].shift();
-        toggle(data[u], true);
-        toggle(index, false, true);
-        insert(index++, u);
-        if (sorted || ++tc > base / 2) {
-          detog();
-          tc = 0;
+    var index = -1;
+    var solid = 0;
+    var filled = false;
+    while(!filled) {
+        detog();
+        solid = ++index;
+        filled = true;
+        for(let i = 0; i < buckets.length; i++) {
+            auxmulti(buckets, "Buckets");
+            if(buckets[i].length !== 0) {
+                insert(solid, buckets[i].shift());
+                filled = false;
+                toggle(solid, true);
+            }
+           
+            solid += index + buckets[i].length;
         }
-        auxmulti(buckets, "Buckets");
-      }
-      /*for (let j = 0; j < b.length; j++) {
-				toggle(b[j], true);
-				toggle(index, false, true);
-				insert(index++, b[j]);
-				if (sorted || ++tc > base / 2) {
-					detog();
-					tc = 0;
-				}
-                                if (!sorted) auxmulti(b, false, "Bucket");
-			}*/
-      detog();
-      buckets[i] = [];
     }
   }
 
@@ -1223,7 +1238,6 @@ const exclude = [
   qsany,
   anyheap,
   lsdate,
-  lsdtwo,
   lsdhex,
   lsdtop
 ];
