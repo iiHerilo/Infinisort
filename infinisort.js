@@ -287,7 +287,7 @@ function process(obj) {
         else if(debug.auto_mode === "random")
             addRandomMode();
         else
-            addSort(3)
+            addSort(30)
         detog();
         addMode(0);
         //addMode(3); /* For debugging specific algorithms */
@@ -1300,6 +1300,67 @@ function counting() {
     
 }
 
+function mergesort() {
+    function merge(l, m, r) {
+        var n1 = m - l + 1;
+        var n2 = r - m;
+        
+        var L = new Array(n1);
+        var R = new Array(n2);
+        
+        for(var i = 0; i < n1; i++) {
+            L[i] = data[l + i];
+            detog();
+            toggle(l + i);
+        }
+        for(var j = 0; j < n2; j++) {
+            R[j] = data[m + 1 + j];
+            detog();
+            toggle(m + l + j);
+        }
+        
+        var i = 0;
+        var j = 0;
+        var k = l;
+        while(i < n1 && j < n2) {
+            detog();
+            toggle(k);
+            if(L[i] <= R[j]) {
+                insert(k, L[i]);
+                i++;
+            }
+            else {
+                insert(k, R[j]);
+                j++;
+            }
+            k++;
+        }
+        
+        while(i < n1) {
+            toggle(k);
+            insert(k, L[i]);
+            i++;
+            k++;
+        }
+        while(j < n2) {
+            toggle(k);
+            insert(k, R[j]);
+            j++;
+            k++;
+        }
+        
+    }
+    function sort(l,r) {
+        if(l>=r) {return;}
+        var m = l + Math.floor((r-l)/2);
+        sort(l,m);
+        sort(m+1,r);
+        merge(l,m,r);
+    }
+    log("Merge Sort");
+    sort(0, max);
+}
+
 
 const allfuncs = [
   selection,
@@ -1331,7 +1392,8 @@ const allfuncs = [
   lsdhex,
   lsdtop,
   shell,
-  counting
+  counting,
+  mergesort
 ];
 const exclude = [
   qsany,
