@@ -20,8 +20,8 @@ var debug = {
     show_aux: true,
     tpf: 0,
     tasks_left: 0,
-   //auto_mode: "random",
-    auto_mode: "in",
+    auto_mode: "random",
+    //auto_mode: "in",
     enable_repeats: false,
     enable_b2bs: false,
     disable_toggles: false
@@ -287,7 +287,7 @@ function process(obj) {
         else if(debug.auto_mode === "random")
             addRandomMode();
         else
-            addSort(27)
+            addSort(28)
         detog();
         addMode(0);
         //addMode(3); /* For debugging specific algorithms */
@@ -1233,6 +1233,41 @@ function shell() {
     detog();
 }
 
+function counting() {
+    log("Counting Sort");
+    
+    var n = max;
+    
+    var out = [];
+    var count = [];
+    for(let i = 0; i < n; i++) {
+        count[i] = 0;
+    }
+    
+    for(let i = 0; i < n; i++) {
+        count[data[i]-1]++;
+        toggle(i, false, true);
+        toggle(i, false, true);
+        toggle(i, false, true);
+    }
+    for(let i = 1; i < count.length; i++) {
+        count[i] += count[i-1];
+        toggle(i, false, true);
+        toggle(i, false, true);
+        toggle(i, false, true);
+    }
+    for(let i = n-1; i >= 0; i--) {
+        out[count[data[i]]-1] = data[i];
+        count[data[i]]--;
+    }
+    for(let i = 0; i < n; i++) {
+        insert(i, out.shift());
+        toggle(i, false, true);
+        toggle(i, false, true);
+    }
+    
+}
+
 
 const allfuncs = [
   selection,
@@ -1262,7 +1297,8 @@ const allfuncs = [
   lsdten,
   lsdhex,
   lsdtop,
-  shell
+  shell,
+  counting
 ];
 const exclude = [
   qsany,
