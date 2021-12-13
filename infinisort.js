@@ -287,7 +287,7 @@ function process(obj) {
         else if(debug.auto_mode === "random")
             addRandomMode();
         else
-            addSort(28)
+            addSort(3)
         detog();
         addMode(0);
         //addMode(3); /* For debugging specific algorithms */
@@ -518,7 +518,7 @@ function verify() {
     for(let i = 0; i < max; i++) {
         toggle(i, false, true);
         insert(i, i+1);
-        hop(i % 2 === 0 ? 0 : -1);
+        hop(i % 4 === 0 ? -1 : 0);
     }
     
 }
@@ -590,6 +590,38 @@ function insertion() {
     }
   }
   detog();
+}
+
+function binaryins() {
+    log("Binary Insertion Sort");
+    function search(item, low, high) {
+        if(high <= low)
+            return (item >= data[low]) ? (low + 1) : low;
+        var mid = Math.floor((low+high)/2);
+        toggle(mid);
+        if(item == data[mid])
+            return mid+1;
+        if(item > data[mid])
+            return search(item, mid+1, high);
+        return search(item, low, mid-1);
+    }
+    for(let i = 1; i < max; i++) {
+        detog();
+        let j = i - 1;
+        let x = data[i]
+        
+        let pos = search(x, 0, j);
+        
+        while(j >= pos) {
+            insert(j + 1, data[j]);
+            toggle(j, true, true);
+            j--;
+        }
+        
+        
+       insert(j+1, x);
+    }
+    detog();
 }
 
 function bubble() {
@@ -1273,6 +1305,7 @@ const allfuncs = [
   selection,
   dualselect,
   insertion,
+  binaryins,
   bubble,
   optbubble,
   cocktail,
