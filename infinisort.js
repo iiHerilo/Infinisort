@@ -287,7 +287,7 @@ function process(obj) {
         else if(debug.auto_mode === "random")
             addRandomMode();
         else
-            addSort(30)
+            addSort(31);
         detog();
         addMode(0);
         //addMode(3); /* For debugging specific algorithms */
@@ -1342,6 +1342,7 @@ function mergesort() {
             i++;
             k++;
         }
+        detog();
         while(j < n2) {
             toggle(k);
             insert(k, R[j]);
@@ -1361,6 +1362,48 @@ function mergesort() {
     sort(0, max);
 }
 
+function mergeip() {
+    function merge(start, mid, end) {
+        let start2 = mid + 1;
+        if(data[mid] <= data[start2]) return;
+        while(start <= mid && start2 <= end) {
+            detog();
+            toggle(start, true);
+            toggle(start2, true);
+            if(data[start] <= data[start2]) {
+                start++;
+            }
+            else {
+                let value = data[start2];
+                let index = start2;
+                
+                while(index !== start) {
+                    detog();
+                    toggle(start, true);
+                    toggle(start2, true);
+                    toggle(index, true, true);
+                    insert(index, data[index-1]);
+                    hop(index % 3 === 2 ? 3 : 2);
+                    index--;
+                }
+                insert(start, value);
+                
+                start++;
+                mid++;
+                start2++;
+            }
+        }
+    }
+    function sort(l,r) {
+        if(l>=r) {return;}
+        var m = l + Math.floor((r-l)/2);
+        sort(l,m);
+        sort(m+1,r);
+        merge(l,m,r);
+    }
+    log("In-Place Merge Sort");
+    sort(0, max);
+}
 
 const allfuncs = [
   selection,
@@ -1393,7 +1436,8 @@ const allfuncs = [
   lsdtop,
   shell,
   counting,
-  mergesort
+  mergesort,
+  mergeip
 ];
 const exclude = [
   qsany,
