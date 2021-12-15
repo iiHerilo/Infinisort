@@ -273,7 +273,7 @@ function process(obj) {
     }
   } catch (error) { // Catch an error if there is no more tasks to process
     //console.log(error);
-    if (error.message != "Cannot read properties of undefined (reading 'type')") console.log(error);
+    if (error.message != "Cannot read properties of undefined (reading 'type')" && error.message != "Cannot read property 'type' of undefined") console.log(error);
     else if (autosort) {
       console.log("Adding new sorts...");
       setCurrentText("Adding new sorts...");
