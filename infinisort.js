@@ -14,7 +14,7 @@ const ID = {
 };
 
 var debug = {
-    version: "v1.0.6-DEV",
+    version: "v1.0.6",
     enabled: false,
     show_globals: false,
     show_aux: true,
