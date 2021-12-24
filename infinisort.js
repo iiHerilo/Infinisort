@@ -1,3 +1,6 @@
+import {Howl, Howler} from 'howler';
+const {Howl, Howler} = require('howler');
+
 // The radius of the circle (should be relative to canvas height &/or width
 const rTolerance = 5;
 
@@ -14,14 +17,14 @@ const ID = {
 };
 
 var debug = {
-    version: "v1.0.6",
+    version: "v1.0.7-DEV",
     enabled: false,
     show_globals: false,
     show_aux: true,
     tpf: 0,
     tasks_left: 0,
-    auto_mode: "random",
-    //auto_mode: "in",
+    //auto_mode: "random",
+    auto_mode: "in",
     enable_repeats: false,
     enable_b2bs: false,
     disable_toggles: false
@@ -31,6 +34,7 @@ function toggleDebug() {
 }
 
 var sortcount;
+var sorting = false;
 var max;
 var spd;
 var cx;
@@ -107,6 +111,9 @@ function getCanvasHeight(id = ID.main) {
   return getElement(id).getAttributeNode('height').value;
 }
 
+function playsound(index) {
+    
+}
 
 function fillData() {
   for (var i = 0; i < max; i++) {
@@ -148,12 +155,14 @@ function draw() {
   // Repeat as many times as the speed calls for (adaptive depending on the 
   // number of items.)
   for (let i = 0; i < (spd * Math.ceil(max / 250)); i++) {
+      
       debug.tpf++;
     // Process the first task in the array.
     process(task[0]);
     try {
         if(task[0].type === "toggle" && debug.disable_toggles)
             i--;
+        console.log(task[0].type + ": " + task.length);
       // Toggle tasks have a "shrink" boolean, which keeps the iterator of
       // this loop from incrementing, slightly shrinking the sort time.
       if (task[0].type === "aux" || (task[0].type === "toggle" && (!debug.disable_toggles) && task[0].shrink ))
@@ -167,6 +176,12 @@ function draw() {
             }
     } catch (error) {
         console.log(error);
+        if(task.length == 0) {
+            //process(task[0]);
+            break;
+        }
+        
+            
     }
     // Remove the first item from the task list.
     task.shift();
@@ -178,10 +193,12 @@ function draw() {
   // Render every toggled location in the toggles array.
   for (let i = 0; i < togs.length && (!debug.disable_toggles); i++) {
     slice(togs[i], "#000000");
+    playsound(togs[i]);
   }
   // Render the toggled location from the single-toggle variable
   if (sing >= 0 && (!debug.disable_toggles)) {
     slice(sing, "#000000");
+    playsound(sing);
   }
   // If a detog has been processed, force the toggle variables to clear.
   if (boal) cleartogs();
@@ -220,6 +237,7 @@ function process(obj) {
         vdat[obj.b] = temp;
         break;
       case "switch": // Switch tasks run new algorithms based on the mode
+          sorting = true;
         sing = -1; // Also clear potential toggles
         tlast = task.length;
         sp = mode.shift();
@@ -238,6 +256,7 @@ function process(obj) {
 			}
 
         }
+        sorting = false;
         //console.log((task.length - tlast) + " tasks added.");
         break;
       case "report": // Report to the console and designated spot in the 
@@ -266,19 +285,29 @@ function process(obj) {
           audt.push(obj.index);
         } else
           audt = obj.index;
-
+        break;
+    case "fill":
+        console.log(obj.array);
+        if(obj.whole)
+            vdat = obj.array;
+        else {
+            for(let i = 0; i < obj.array.length && i < max; i++) {
+                vdat[i] = obj.array[i];
+            }
+        }
       case "wait": // Wait a few frames.
       case "default":
         break;
     }
   } catch (error) { // Catch an error if there is no more tasks to process
     //console.log(error);
-    if (error.message != "Cannot read properties of undefined (reading 'type')" && error.message != "Cannot read property 'type' of undefined") console.log(error);
+    sorting = true;
+    if (error.message != "Cannot read properties of undefined (reading 'type')" && error.message != "Cannot read property 'type' of undefined" ) console.log(error);
     else if (autosort) {
       console.log("Adding new sorts...");
       setCurrentText("Adding new sorts...");
 	  applied = [];
-      for (let i = 0; i < 10; i++) {
+      for (let i = 0; i < 1; i++) {
         addMode(1);
         detog();
         addMode(0);
@@ -287,7 +316,8 @@ function process(obj) {
         else if(debug.auto_mode === "random")
             addRandomMode();
         else
-            addSort(31);
+            addSort(32);
+        sorting = true;
         detog();
         addMode(0);
         //addMode(3); /* For debugging specific algorithms */
@@ -295,6 +325,7 @@ function process(obj) {
       // Momentarily wait.
       addMode(0);
     }
+    sorting = false;
   }
 }
 
@@ -387,7 +418,7 @@ function addMode(a) {
   mode.push(a);
   addSwitch();
 }
-
+// Add something the the auz visuliazer
 function aux(index, single, subtitle = "AUX") {
   var f = [];
   try {
@@ -405,7 +436,7 @@ function aux(index, single, subtitle = "AUX") {
     });
   }
 }
-
+// Add a multi-dimensional array to the aux visualizer
 function auxmulti(arr, subtitle = "AUX") {
   var f = [];
   for (let i = 0; i < arr.length; i++) {
@@ -418,6 +449,22 @@ function auxmulti(arr, subtitle = "AUX") {
   }
   //console.log(f);
   aux(f, false, subtitle);
+}
+// Fill all visual data with an array.
+function fill(array) {
+    task.push({
+        type: "fill",
+        array: array,
+        whole: array.length === data.length
+    });
+    
+}
+function fix() {
+    task.push({
+        type: "fill",
+        array: data,
+        whole: true
+    })
 }
 // Add a toggle task
 function toggle(index, shrink, single = false) {
@@ -467,7 +514,7 @@ function log(s) {
     sort: s
   });
 }
-
+// Add an insertion task and insert a value
 function insert(index, value) {
   data[index] = value;
   task.push({
@@ -1405,6 +1452,253 @@ function mergeip() {
     sort(0, max);
 }
 
+function smooth() {
+    // anything but
+    log("Smooth Sort");
+    // i dont know if i will finish implementing this
+    function isAscending(a, b) {
+        return a > b;
+    }
+    function up(ia, ib, temp) {
+        temp = ia;
+        ia += ib + 1;
+        ib = temp;
+    }
+    function down(ia, ib, temp) {
+        temp = ib;
+        ib = ia - ib - 1;
+        ia = temp;
+    }
+    let q, r, p, b, c, r1, b1, c1;
+    function sift() {
+        let r0, r2, temp = 0, t;
+        r0 = r1;
+        t = data[r0];
+        
+        while(b1 >= 3) {
+            r2 = r1 - b1 + c1;
+            if(!isAscending(data[r1-1],data[r2])) {
+                r2 = r1 - 1;
+                down(b1, c1, temp);
+            }
+            if(isAscending(data[r2],t)) {
+                b1 = 1;
+            }
+            else {
+                insert(r1, data[r2]);
+                r1 = r2;
+                down(b1, c1, temp);
+            }
+        }
+        if(r0-r1) insert(r1, t);
+    }
+    function trinkle() {
+        let p1, r2, r3, r0, temp = 0, t;
+        p1 = p;
+        b1 = b;
+        c1 = c;
+        r0 = r1;
+        t = data[r0];
+        
+        while(p1 > 0) {
+            while((p1 & 1) === 0) {
+                p1 >>= 1;
+                up(b1, c1, temp);
+            }
+            r3 = r1 - b1;
+            
+            if((p1 == 1) || isAscending(data[r3], t)) 
+                p1 = 0;
+            else {
+                --p1;
+                if(b1 == 1) {
+                    insert(r1, data[r3]);
+                    r1 = r3
+                }
+                else if(b1 >= 3) {
+                    r2 = r1 - b1 + c1;
+                    
+                    if(!isAscending(data[r1-1], data[r2])) {
+                        r2 = r1 - 1;
+                        down(b1, c1);
+                        p1 <<= 1;
+                    }
+                    if (isAscending(data[r2], data[r3])) {
+                        insert(r1, data[r3]);
+                        r1 = r3;
+                    }
+                    else {
+                        insert(r1, data[r2]);
+                        r1 = r2
+                        down(b1, c1);
+                        p1 = 0;
+                    }
+                }
+            }
+            
+            
+        }
+        if(r0 - r1) insert(r1, t);
+    }
+    function semitrinkle() {
+        var temp;
+        r1 = r - c;
+        
+        if(!IsAscending(data[r1], data[r])) {
+            swap(r, r1);
+            trinkle();
+        }
+    }
+    var temp;
+    q=1,r=0,p=1,b=1,c=1;
+    while(q < max) {
+        r1 = r;
+        if((p & 7) == 3) {
+            b1 = b;
+            c1 = c;
+            sift();
+            p = (p + 1) >> 2;
+            up(b,c);
+            up(b,c);
+        }
+        else if((p & 3) == 1) {
+            if(q + c < max) {
+                b1 =b ;
+                c1 = c;
+                sift();
+            }
+            else trinkle();
+            
+            down(b,c);
+            p <<= 1;
+            
+            while(b > 1) {
+                down(b, c);
+                p <<= 1;
+            }
+            
+            p++;
+        }
+        q++;
+        r++;
+    }
+    r1 = r;
+    trinkle();
+    
+    while(q > 1) {
+        --q;
+        if(b == 1) {
+            r--;
+            p--;
+            while((p & 1) == 0) {
+                p >>= 1;
+                up(b, c);
+            }
+        }
+        else {
+            if(b >= 3) {
+                p--; 
+                r -= b + c;
+                if(p>0) semitrinkle();
+                down(b,c);
+                p=(p<<1)+1;
+                r += c;
+                semitrinkle();
+                down(b,c);
+                p=(p<<1)+1;
+            }
+        }
+    }
+}
+
+function phase() {
+    log("Herilo's Phase Sort");
+}
+
+function bead() {
+    log("Bead/Gravity Sort"); 
+    let top = 0;
+    for(let i = 0; i < max; i++) {
+        if(data[i] > top) {
+            top = data[i];
+        }
+    }
+    var grid = [];
+    var lvls = [];
+    for(let i = 0; i < max; i++) {
+        grid[i] = [];
+        for(let j = 0; j < top; j++) {
+            grid[i][j] = 0;
+        }
+    }
+    for(let i = 0; i < top; i++) {
+        toggle(i, false, true);
+        toggle(i, false, true);
+        toggle(i, false, true);
+        
+        for(let j = 0; j < data[i]; j++) {
+            grid[i][j] = 1;
+        }
+    }
+
+    
+    var sorted = false;
+    var info = []
+    while(!sorted) {
+        sorted = true;
+        for(let j = max - 2; j >= 0; j--) {
+            //console.log(j + "|" + j + "|" + j + "|" + j + "|" + j + "|" + j + "|" + j + "|" + j + "|" + j + "|" + j + "|" + j + "|" + j);
+            var k = 0;
+            while(grid[j][k] == 1) {
+                //console.log("grid[" + j + "][" + k + "] is 1.")
+                if(grid[j+1][k] == 0) {
+                    //console.log("but grid[" + (j+1) + "][" + k + "] is actually 0.")
+                    grid[j+1][k] = 1;
+                    grid[j][k] = 0;
+                    //console.log("now opposing.")
+                    sorted = false;
+                }
+                k++;
+            }
+        }
+        for(let i=0; i < grid.length; i++) {
+            info[i] = 0;
+            for(let j=0; j < grid[i].length; j++) {
+                info[i] += grid[i][j];
+                if(grid[i][j] == 0) break;
+            }
+
+        }
+        
+        //aux(info, false, "Beads");
+        //hop(-1);
+        console.log("trip! s" + sorted + "     ---------------------------------")
+    }
+    var smthn = 0;
+    for(let i = 0; i < max; i++) {
+        for(let j = 0; j < max; j++) {
+            if(data[j] > info[j]) {
+                //toggle(j, true);
+                insert(j, data[j]-1);
+                toggle(j, true, true);
+                //insert(j, data[j]-1);
+            }
+            else if(data[j] < info[j]) {
+                //toggle(j, true);
+                insert(j, data[j]+2);
+                toggle(j, true, true);
+            }
+            //fill(nwer);
+            hop(2)
+            if(++smthn % 5 == 0) {
+                toggle(j, false, true);
+            }
+        }
+    }
+    
+    
+}
+
 const allfuncs = [
   selection,
   dualselect,
@@ -1437,7 +1731,8 @@ const allfuncs = [
   shell,
   counting,
   mergesort,
-  mergeip
+  mergeip,
+  bead
 ];
 const exclude = [
   qsany,
