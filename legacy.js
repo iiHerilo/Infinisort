@@ -1,5 +1,5 @@
 import {Howl, Howler} from 'howler';
-const {Howl, Howler} = require('howler');
+//const {Howl, Howler} = require('howler');
 
 // The radius of the circle (should be relative to canvas height &/or width
 const rTolerance = 5;
