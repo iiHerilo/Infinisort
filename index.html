@@ -5,7 +5,117 @@
         <title>Infinisort</title>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <script src="main.js"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+        <script src="chart.js"></script>
+        <script src="datagen.js"></script>
+        <script src="processor.js"></script>
+        <script src="compiled.js"></script>
+        <script> 
+            var config;
+            const chart = new PieChart();
+            const datagen = new DataGen();
+            const processor = new Processor();
+            $(document).ready(function() {
+                $.getJSON('config.json', function(data) {
+                    config = data;
+                    checkModules();
+                    run();
+                });
+            });
+            var data = {
+                d: [],
+                colors: [],
+                v: [],
+                max: 0,
+                togs: [],
+                sing: -1,
+                aux: [],
+                ctx: null,
+                atx: null,
+                detog: false,
+                task: []
+            };
+            var dim = { /*
+             * h: height,
+             * w: width,
+             * x: center x,
+             * y: center y,
+             * r: radius
+             */
+            };
+            function getElement(id) {
+                return document.getElementById(id);
+            }
+            function setCurrentText(s) {
+                getElement(config.ID.current).innerHTML = s;
+            } 
+            function checkModules() {
+                console.debug(PieChart);
+                console.debug(DataGen);
+                console.debug(Sorter);
+                console.debug(Processor);
+                console.debug(config);
+            }
+            function run() {
+                console.log("run process started.");
+                data.max = config.default_array_length;
+                data.d = datagen.getArray(data.max);
+                data.colors = datagen.getColorArray(data.max);
+                data.v = data.d;
+                data.ctx = getElement(config.ID.main).getContext('2d');
+                data.atx = getElement(config.ID.aux).getContext('2d');
+                console.info('Data initialized:')
+                console.info(data);
+                var _h = getElement(config.ID.main).getAttributeNode('height').value, 
+                    _w = getElement(config.ID.main).getAttributeNode('width').value;
+                dim = {
+                    h: _h,
+                    w: _w,
+                    x: _w/2,
+                    y: _h/2,
+                    r: ((_w/2 + _h/2) / 2) - config.rad_tolerance
+                };
+                //dim.r = (dim.w / 2 + dim.h / 2) / 2 - config.rad_tolerance;
+                console.info('Dimensions initialized:');
+                console.info(dim);
+                getElement(config.ID.ver).innerHTML = config.version;
+                
+                console.log("Initialization successful.");
+                draw();
+            }
+            var ink = 0
+            function draw() {
+                ink++;
+                //console.log("Draw called");
+                processor.process(data);
+                chart.draw(data.ctx, {
+                    data: data.v,
+                    colors: data.colors,
+                    toggles: data.togs,
+                    singletog: data.sing,
+                    dimensions: {width: dim.w, height: dim.h},
+                    center: {x: dim.x, y: dim.y},
+                    radius: dim.r,
+                    cc: false
+                });
+                chart.draw(data.atx, {
+                    data: data.aux,
+                    colors: data.colors,
+                    toggles: [],
+                    singletog: -1,
+                    dimensions: config.aux_dimensions,
+                    center: config.aux_center,
+                    radius: config.aux_dimensions.height - config.rad_tolerance,
+                    cc: false
+                });
+                if(data.detog) {
+                    data.detog = false;
+                    data.togs = [];
+                    data.sing = -1;
+                }
+                window.requestAnimationFrame(draw);
+            }
+        </script>
     </head>
     <body >
         <div style="text-align:center;">
@@ -21,9 +131,5 @@
                 <canvas id="auxcanv" width="100" height="100"> </canvas>
             </div>
         </div>
-        <!-- looking at these
-        https://github.com/browserify/browserify-handbook
-		https://webpack.js.org/
-                -->
     </body>
 </html>
