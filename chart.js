@@ -2,6 +2,7 @@
 
 function PieChart() {
     this.draw = function (ctx, d) {
+        if(d.max === null || d.max < 0) d.max = d.data.length;
         //console.log("Drawing pie chart with ctx " + ctx.toString());
         ctx.clearRect(0, 0, d.dimensions.width, d.dimensions.height);
         // Render a pieslice
@@ -13,7 +14,7 @@ function PieChart() {
             ctx.beginPath();
             ctx.fillStyle = fill;
             ctx.moveTo(d.center.x, d.center.y);
-            ctx.arc(d.center.y, d.center.y, d.radius, rotateA, rotateB, d.cc);
+            ctx.arc(d.center.y, d.center.y, d.radius, rotateA, rotateB, config.counterclockwise);
             ctx.moveTo(d.center.x, d.center.y);
             ctx.fill();
         }
@@ -23,17 +24,18 @@ function PieChart() {
         }
         // Get the angle of a slice (only dependant on number of items)
         function theta() {
-            return (2 * Math.PI) / d.data.length;
+            return (2 * Math.PI) / d.max;
         }
-        for (let i = 0; i < d.data.length; i++) {
+        for (let i = 0; i < d.max; i++) {
             slice(i, d.colors[d.data[i]]);
         }
         if (d.toggles !== null && d.toggles.length !== 0 && !config.disable_toggles) {
             for (let i = 0; i < d.toggles.length; i++) {
-                slice(d.toggles[i], "#000000");
+                if(d.toggles[i] >= 0 && d.toggles[i] < d.max)
+                    slice(d.toggles[i], "#000000");
             }
         }
-        if (d.singletog !== null && d.singletog >= 0) {
+        if (d.singletog !== null && d.singletog >= 0 && d.singletog < d.max) {
             slice(d.singletog, "#000000");
         }
 
@@ -43,6 +45,7 @@ function PieChart() {
 /*
 {
     data: int array,
+    max: int
     colors: string array,
     toggles: int array,
     singletog: int,
