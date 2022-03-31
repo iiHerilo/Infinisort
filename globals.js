@@ -43,7 +43,7 @@ const ID = {
 
 var mainC; // Main Canvas
 var auxlC; // Auxiliary Canvas
-var colors = []; // Available Colors
+var cols = []; // Available Colors
 var data = []; // Main Data
 var vdat = []; // Visual Data
 var auxd = []; // Auxiliary Data

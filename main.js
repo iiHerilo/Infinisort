@@ -2,7 +2,7 @@ function init() {
     console.info("CONFIG: %o", CFG);
     max = CFG.default_array_length;
     data = sequence(0, max);
-    colors = colors(max);
+    cols = colors(max);
     vdat = data;
     mainC = element(ID.main).getContext('2d');
     auxlC = element(ID.aux).getContext('2d');
@@ -24,7 +24,7 @@ function draw() {
     PieChart(mainC, {
         data: vdat,
         max: null,
-        colors: colors,
+        colors: cols,
         toggles: togs,
         singletog: sing,
         dimensions: {width: dimensions.w, height: dimensions.h},
@@ -38,7 +38,7 @@ function draw() {
         PieChart(auxlC, {
             data: auxd,
             max: null,
-            colors: colors,
+            colors: cols,
             toggles: [],
             singletog: -1,
             dimensions: CFG.aux_dimensions,
