@@ -103,14 +103,21 @@ function swap(a, b) {
     debug("Adding a SWAP task");
 }
 
-function log(s) {
+function log(s, isSort = true) {
     g = 0;
-    if (s !== "Shuffling...") console.log(`Animating ${s}`);
+    if (isSort) console.log(`Animating ${s}`);
     task.push({
         type: "report",
         sort: s // a string holding the name of the sort
     });
     debug("Adding a LOG task");
+}
+
+function reset() {
+    data = sequence(0, max);
+    task.push({
+        type:"reset",
+    })
 }
 
 function insert(index, value) {

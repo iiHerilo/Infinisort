@@ -1,6 +1,6 @@
 /*** GLOBAL CONFIG ***/
 var CFG = {
-    version: "v1.2.1",
+    version: "v1.2.2a",
     debug_enabled: false,
     show_globals: false,
     detailed_console: true,

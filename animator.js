@@ -60,6 +60,9 @@ function process() {
                         i = 9999;
                     }
                     break;
+                case "reset":
+                    vdat = sequence(0, max);
+                    break;
                 case "sound": break;
             }
             switch(tsk.type) {

@@ -3,7 +3,7 @@ const include = [selection, dualselect, insertion, binaryins, bubble, optbubble,
     ternheap, oddeven, gnome, optgnome, comb, circle, cycle, shell,
     counting, mergesort, mergeip, lsdten,
 ];
-var exclude = [];
+var exclude = [cycle, lsdten];
 
 function sort() {
     if (CFG.auto_mode === 2) {
@@ -47,7 +47,7 @@ function testzone() {
 }
 
 function shuffle(asMode = true) {
-    if (asMode) log("Shuffling...");
+    if (asMode) {reset(); log("Shuffling...", false);}
     aux('F', true, "", true);
     for (let i = 0; i < max; i++) {
         var ran = Math.floor(Math.random() * max);
@@ -60,7 +60,16 @@ function shuffle(asMode = true) {
 }
 
 function reverse(asMode = true) {
-
+    if (asMode) {
+        log("Reversing...");
+    }
+    for (let i = 0; i < Math.floor(max / 2); i++) {
+        detog();
+        swap(i, max - i - 1);
+        toggle(i);
+        toggle(max - i - 1);
+    }
+    detog();
 }
 
 function verify() {
@@ -562,7 +571,9 @@ function oddeven() {
 function gnome() {
     log("Gnome Sort")
     var i = 0;
-    while (i < max) {
+    var iterations = 0;
+    var cieling = max * max;
+    while (i < max && iterations++ <= cieling) {
         //console.log(data.length);
 
         if (i === 0 || data[i] >= data[i - 1]) {
@@ -578,6 +589,7 @@ function gnome() {
             aux([data[i], data[i - 1]], false, "Comparison");
         }
     }
+    if(iterations++ <= cieling) {console.warn("Gnome Sort got stuck in an infinite loop! The algorithm has stopped.")}
     detog();
 }
 
