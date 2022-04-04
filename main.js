@@ -1,6 +1,4 @@
 function init() {
-    element(ID.main).style.height = element(ID.main).getAttributeNode('height').value;
-    element(ID.main).style.width = element(ID.main).getAttributeNode('width').value;
     window.addEventListener('resize', clamp)
     clamp();
     console.info("CONFIG: %o", CFG);
@@ -21,8 +19,6 @@ function init() {
     element("version").innerHTML = CFG.version;
     halt(CFG.wait_time);
     draw();
-    console.info(window.innerHeight);
-    console.info(window.innerWidth)
 }
 
 function draw() {
@@ -78,7 +74,6 @@ function clamp() {
     if (wh < ww) {
         element(ID.main).style.height = `${wh - 300}px`;
         element(ID.main).style.width = `${wh - 300}px`;
-        console.log(`${wh - 300}px`)
     }
     else if (calcHeight > ww){
         element(ID.main).style.height = `auto`;
