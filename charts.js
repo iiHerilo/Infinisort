@@ -11,7 +11,7 @@ function PieChart(ctx, d) {
             console.warn(`${d.data[i] - d.tru} < ${0}! changed to ${d.data[i]}`)
         }
     }
-    //if(d.log) console.log("Drawing pie chart with data %o", d.data);
+    if(d.log) console.log("Drawing pie chart with data %o", d.data);
     ctx.clearRect(0, 0, d.dimensions.width, d.dimensions.height);
     if(d.nun) return false;
     // Get the angle of a slice (only dependant on number of items)

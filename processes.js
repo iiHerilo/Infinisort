@@ -26,7 +26,7 @@ function aux(index, single, subtitle, nun = false) {
             nun: nun,
         });
     }
-    debug("Adding a AUX task");
+    debug(`AUX array ${f}`);
 }
 
 function auxmulti(arr, subtitle) {
@@ -50,7 +50,7 @@ function fill(array) {
         array: array, // the data that will be filled
         whole: array.length === data.length // if the data is equal in length to prev
     });
-    debug("Adding a FILL task");
+    debug(`FILL array ${array}`);
 }
 
 function fix() {
@@ -59,7 +59,7 @@ function fix() {
         array: data, // fills the array with itself to fix lost or extra points
         whole: true // the data is whole
     });
-    debug("Adding a FIX task");
+    debug("FIX");
 }
 
 function toggle(index, shrink = false, single = false) {
@@ -70,14 +70,14 @@ function toggle(index, shrink = false, single = false) {
         shrink: shrink, // Whether the processor should increment
         single: single // Whether the toggle is to be single
     });
-    debug("Adding a TOGGLE task");
+    debug(`TOGGLE index ${index} (${shrink ? "shrunk" : "unshrunk"}, ${single ? "single" : "stacked"})`);
 }
 
 function detog() {
     task.push({
         type: "detog"
     });
-    debug("Adding a DETOG task");
+    debug("DETOG");
 }
 
 function hop(length = 1) {
@@ -85,7 +85,7 @@ function hop(length = 1) {
         type: "hop",
         length: length // How many processor clocks will be skipped
     });
-    debug("Adding a HOP task");
+    debug(`HOP ${length} tasks`);
 }
 
 function swap(a, b) {
@@ -100,7 +100,7 @@ function swap(a, b) {
         a: a, // loccation a that will be swapped with b
         b: b // location b that will be swapped with a
     });
-    debug("Adding a SWAP task");
+    debug(`SWAP ${a} (${data[b]}) with ${b} (${data[a]})`);
 }
 
 function log(s, isSort = true) {
@@ -110,7 +110,7 @@ function log(s, isSort = true) {
         type: "report",
         sort: s // a string holding the name of the sort
     });
-    debug("Adding a LOG task");
+    debug(`LOG ${s}`);
 }
 
 function reset() {
@@ -118,6 +118,7 @@ function reset() {
     task.push({
         type:"reset",
     })
+    debug(`RESET`);
 }
 
 function insert(index, value) {
@@ -128,7 +129,7 @@ function insert(index, value) {
         index: index, // index of point that will be replaced
         value: value // value that will take its place
     });
-    debug("Adding a INSERT task");
+    debug(`INSERT ${value} at ${index}`);
 }
 
 function slide(index, newdex) {
@@ -142,7 +143,7 @@ function slide(index, newdex) {
     for(let i = index; b ? (i < newdex) : (i > newdex); b ? i++ : i--) 
         s(i, b ? (i + 1) : (i - 1));
     task.push({type:"slide",oi:index,ni:newdex})
-    debug("Adding a SLIDE task");
+    debug(`SLIDE ${index} to ${newdex}`);
 }
 
 function halt(length = CFG.wait_time) {
@@ -150,7 +151,7 @@ function halt(length = CFG.wait_time) {
         type: "wait",
         length: length // wait time, in frames
     });
-    debug("Adding a HALT task");
+    debug(`HALT ${length} frames`);
 }
 
 function sound(index) {
@@ -159,5 +160,6 @@ function sound(index) {
 
 
 function debug(txt) {
-    //console.log(`${g++}: ${txt}`)
+    if (CFG.log_all_tasks)
+        console.log(`Task ${g++}: ${txt}`)
 }

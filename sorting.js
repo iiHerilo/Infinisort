@@ -1,17 +1,23 @@
+// These are all of the available sorting algorithms
 const include = [selection, dualselect, insertion, binaryins, bubble, optbubble,
     cocktail, qsmax, qsmin, qsmed, qsran, qsdual, qstable, maxheap, minheap,
     ternheap, oddeven, gnome, optgnome, comb, circle, cycle, shell,
     counting, mergesort, mergeip, lsdten,
 ];
+// These algorithms are to be excluded. 
+// Will cause a reroll when in random order, and will be skipped in linear order.
+// Ignored in manual mode.
 var exclude = [cycle];
+// This is the index current sorting algorithm in the linear automode.
 var currentSort = 0;
 
+// 
 function sort() {
     try {
     if (CFG.auto_mode === AutoMode.random) {
-        var applied = [];
-        var prv = -1;
-        var neu;
+        var applied = []; // Here to stop repeats if disabled
+        var prv = -1; // Here to stop back-to-backs if disabled
+        var neu; // ditto
         for (let i = 0; i < CFG.amnt_per_cycle; i++) {
             shuffle();
             halt(CFG.wait_time);
@@ -28,7 +34,7 @@ function sort() {
         for(let i = 0; i < CFG.amnt_per_cycle; i++) {
             if (currentSort >= include.length) 
                 currentSort = 0;
-            if (!exclude.includes(include)) 
+            if (!exclude.includes(include[currentSort])) 
                 include[currentSort]();
             currentSort++;
         }
@@ -37,11 +43,11 @@ function sort() {
         include[CFG.auto_manual]();
     }
     }
-    catch(e) {console.error(e)}
+    catch(e) {console.error(e)} // This is here so that the whole page & animation doesn't stop in the event of an exception.
 }
 
 function testzone() {
-    log("THE TESTING ZONE");
+    log("THE TESTING ZONE"); // it tests the things
     halt(100);
     for (let i = 0; i < max; i++) {
         swap(i, i - (i % 4 + 1));
@@ -63,8 +69,10 @@ function testzone() {
 }
 
 function shuffle(asMode = true) {
-    if (asMode) {reset(); log("Shuffling...", false);}
-    aux('F', true, "", true);
+    // asMode should be false if this is being called in the context of another algorithm
+    if (asMode) 
+        reset(), log("Shuffling...", false), aux('F', true, "", true);
+
     for (let i = 0; i < max; i++) {
         var ran = Math.floor(Math.random() * max);
         toggle(i, false);
@@ -76,9 +84,10 @@ function shuffle(asMode = true) {
 }
 
 function reverse(asMode = true) {
-    if (asMode) {
-        log("Reversing...");
-    }
+    // asMode should be false if this is being called in the context of another algorithm
+    if (asMode) 
+        reset(), log("Reversing..."), aux('F', true, "", true);
+    
     for (let i = 0; i < Math.floor(max / 2); i++) {
         detog();
         swap(i, max - i - 1);
@@ -89,8 +98,11 @@ function reverse(asMode = true) {
 }
 
 function verify() {
-
+    // ill implement this later
 }
+
+// im not gonna comment on the algorithms, if you wanna learn about them use google
+
 
 function selection() {
     log("Selection Sort");
@@ -205,7 +217,7 @@ function bubble() {
         for (c = 1; c < a; c++) {
             if (data[c - 1] > data[c]) {
                 swap(c - 1, c);
-                hop((c % 3 === 0 ? 0 : 3));
+                hop((c % 3 === 0 ? 0 : 3)); // shortens the animation time
                 //console.log("c%3=" + c%3 + " so hop " + (c % 3 === 0 ? 0 : 1))
                 detog();
                 b = c;
@@ -271,6 +283,7 @@ function cocktail() {
 }
 
 function quicksort(mode = 0) {
+    // if the mode is -1 itll pick a random pivot
     mode = mode == -1 ? Math.round(Math.random() * 4) : mode;
 
     function partition(low, high) {
@@ -456,19 +469,16 @@ function qstable() {
             g1.shift();
             auxmulti([s1, g1], "Partitions");
         }
-        if (sml.length > 1) {
+        if (sml.length > 1) 
             lft = quick(sml, low, sml.length);
-        }
-        for (let i = 0; i < lft.length; i++) {
+        for (let i = 0; i < lft.length; i++) 
             ans.push(lft[i]);
-        }
         ans.push(piv);
-        if (grt.length > 1) {
+        if (grt.length > 1) 
             rgt = quick(grt, low + sml.length + 1, high);
-        }
-        for (let i = 0; i < rgt.length; i++) {
+        for (let i = 0; i < rgt.length; i++) 
             ans.push(rgt[i]);
-        }
+        
 
         return ans;
     }
@@ -587,18 +597,17 @@ function oddeven() {
 function gnome() {
     log("Gnome Sort")
     var i = 0;
+    // these two are here because for some reason this algorithm goes into an infinite loop sometimes.
+    // the worst commplexity for this algorithm is O(n^2) so if it iterates that many times, it must be done
+    // I would fix the problem at its root but i dont feel like doing that
     var iterations = 0;
     var cieling = max * max;
-    while (i <= max && iterations++ <= cieling) {
-        //console.log(data.length);
-
+    while (i < max && iterations++ <= cieling) {
         if (i === 0 || data[i] >= data[i - 1]) {
-            //console.log("incing " + i)
             toggle(i, false, true);
             i++;
             aux(data[i], true, "Comparison");
         } else {
-            //console.log("decing " + i)
             toggle(i, true, true);
             swap(i, i - 1);
             i--;
@@ -710,14 +719,12 @@ function cycle() {
             if (pos === cycle_start)
                 continue;
             while (arr[item] === arr[pos]) {
-
                 pos += 1;
             }
             if (pos !== cycle_start)
                 swap(pos, item);
             var l = -1;
             while (pos !== cycle_start) {
-
                 pos = cycle_start;
                 for (let i = cycle_start + 1; i < n; i++)
                     if (arr[i] < arr[item]) {
@@ -726,8 +733,6 @@ function cycle() {
                         toggle(pos, i % 4 !== 0);
                     }
                 while (item === arr[pos]) {
-
-
                     pos++;
                 }
                 if (item !== arr[pos])
@@ -747,7 +752,6 @@ function cycle() {
 function lsd(base) {
     log(`Radix LSD Sort Base ${base}`)
     var buckets = [];
-
 
     var sorted = false;
     var expo = 1;
@@ -793,7 +797,7 @@ function lsdten() {
 }
 
 function lsdany() {
-
+    // this should choose a random number but ehh
 }
 
 function shell() {

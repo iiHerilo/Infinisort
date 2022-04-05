@@ -9,11 +9,11 @@ const CFG = {
     enable_backtoback: false,
     disable_toggles: false,
     auto_mode: AutoMode.random,
-    auto_manual: 1,
-    wait_time: 75,
-    amnt_per_cycle: 10,
-    processor_speed: 6,
-    processor_threshold: 250,
+    auto_manual: 1, // index of the sort that will be played in manual mode
+    wait_time: 75, // in frames
+    amnt_per_cycle: 10, // amount of sorts
+    processor_speed: 6, // determines how many tasks get processed in any given frame
+    processor_threshold: 250, // does something similar i think
     aux_dimensions: {
         height: 100,
         width: 100
@@ -22,11 +22,12 @@ const CFG = {
         x: 50,
         y: 50
     },
-    rad_tolerance: 5,
+    rad_tolerance: 5, // How many pixels shorter the radius should be to not be cut off by canvas edges
     default_array_length: 126,
     counterclockwise: false,
     verify_after_sort: true,
-    qs_directional: true,
+    qs_directional: true, // true: Right, Middle, Left     false: Maximum, Median, Minimum     (related to quicksort)
+    log_all_tasks: false,
 };
 /*** ELEMENT IDS ***/
 const ID = {
@@ -54,9 +55,9 @@ var detaux = false; // Whether the aux should be drawn when enabled
 var detogg = false; // Whether the toggles should be cleared
 var task = []; // Task Queue
 var dimensions = {
-    h: -1,
-    w: -1,
-    x: -1,
-    y: -1,
-    r: -1,
+    h: -1, // height
+    w: -1, // width
+    x: -1, // center x
+    y: -1, // center y
+    r: -1, // radius
 };

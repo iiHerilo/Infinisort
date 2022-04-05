@@ -8,9 +8,7 @@ function init() {
     vdat = data;
     mainC = element(ID.main).getContext('2d');
     auxlC = element(ID.aux).getContext('2d');
-    auxlC.moveTo(0,0);
-    auxlC.lineTo(100, 100);
-    auxlC.stroke();
+    // these are different than the css/style attributes and are the actual dimensions of the canvas
     dimensions.h = element(ID.main).getAttributeNode('height').value,
     dimensions.w = element(ID.main).getAttributeNode('width').value;
     dimensions.x = dimensions.w/2;
@@ -24,17 +22,17 @@ function init() {
 function draw() {
     var good = process();
     PieChart(mainC, {
-        data: vdat,
-        max: null,
-        colors: cols,
-        toggles: togs,
-        singletog: sing,
-        dimensions: {width: dimensions.w, height: dimensions.h},
-        center: {x: dimensions.x, y: dimensions.y},
-        radius: dimensions.r,
-        log: false,
-        nun: false,
-        tru: max,
+        data: vdat, // Data to be displayed
+        max: null, // amount of items in the data (i dont use it)
+        colors: cols, // the colors array
+        toggles: togs, // the toggles array
+        singletog: sing, // the singletog value
+        dimensions: {width: dimensions.w, height: dimensions.h}, // chart dimensions
+        center: {x: dimensions.x, y: dimensions.y}, // chart center
+        radius: dimensions.r, // pie radius
+        log: false, // whether the piechart should 
+        nun: false, // Whether it should even be rendered
+        tru: max, // true/global maximum
     })
     if(CFG.show_aux)
         PieChart(auxlC, {
@@ -46,7 +44,7 @@ function draw() {
             dimensions: CFG.aux_dimensions,
             center: CFG.aux_center,
             radius: CFG.aux_dimensions.height/2 - CFG.rad_tolerance,
-            log: true,
+            log: false,
             nun: detaux,
             tru: max,
         })
@@ -65,11 +63,12 @@ function draw() {
     window.requestAnimationFrame(draw);
 }
 
+// makes sure the canvas is sized properly depending on the resolution and aspect ratio of its container window
 function clamp() {
     var wh = window.innerHeight;
     var ww = window.innerWidth;
     var calcHeight = window.getComputedStyle(element(ID.main)).getPropertyValue('height');
-    calcHeight = parseInt(calcHeight.substring(0, calcHeight.length-2));
+    calcHeight = parseInt(calcHeight.substring(0, calcHeight.length-2)); // removes the unit (px) from the height
 
     if (wh < ww) {
         element(ID.main).style.height = `${wh - 300}px`;

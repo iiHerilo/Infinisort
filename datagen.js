@@ -1,8 +1,7 @@
 function sequence(min, max) {
     var a = [];
-    for(let i = min; i < max; i++) {
+    for(let i = min; i < max; i++) 
         a[i-min] = i;
-    }
     return a;
 }
 
@@ -13,7 +12,7 @@ function colors(length) {
     }
     // Get the color of a value
     function color(n) {
-        // Get variables to represent the values of the red green and blue channels
+        // Get variables to represent the values of the red green and blue channels. starting color is red
         var r = rgb(),
             g = 0,
             b = 0;
@@ -26,7 +25,7 @@ function colors(length) {
             else if (r < rgb() && g === 0 && b === rgb()) r++;
             else if (r === rgb() && g === 0 && b > 0) b--;
         }
-        // Divide each channel by the max, then multiply it by 255 (max in hex)
+        // convert each channel to percentage (0-1/0%-100%) then hexadecimal (0-255/00-FF)
         r = Math.floor((r / rgb()) * 255);
         g = Math.floor((g / rgb()) * 255);
         b = Math.floor((b / rgb()) * 255);
@@ -45,8 +44,7 @@ function colors(length) {
         return "#" + ns(r.toString(16)) + ns(g.toString(16)) + ns(b.toString(16));
     }
     var cols = [];
-    for (let i = 0; i < length; i++) {
+    for (let i = 0; i < length; i++) 
         cols[i] = color(i + 1);
-    }
     return cols;
 }
