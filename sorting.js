@@ -3,9 +3,10 @@ const include = [selection, dualselect, insertion, binaryins, bubble, optbubble,
     ternheap, oddeven, gnome, optgnome, comb, circle, cycle, shell,
     counting, mergesort, mergeip, lsdten,
 ];
-var exclude = [cycle, lsdten];
+var exclude = [cycle];
 
 function sort() {
+    try {
     if (CFG.auto_mode === 2) {
         var applied = [];
         var prv = -1;
@@ -22,6 +23,8 @@ function sort() {
             halt(CFG.wait_time);
         }
     }
+    }
+    catch(e) {console.error(e)}
 }
 
 function testzone() {
@@ -573,7 +576,7 @@ function gnome() {
     var i = 0;
     var iterations = 0;
     var cieling = max * max;
-    while (i < max && iterations++ <= cieling) {
+    while (i <= max && iterations++ <= cieling) {
         //console.log(data.length);
 
         if (i === 0 || data[i] >= data[i - 1]) {
@@ -735,7 +738,6 @@ function lsd(base) {
 
     var sorted = false;
     var expo = 1;
-    var b;
     while (!sorted) {
         for (let i = 0; i < base; i++)
             buckets[i] = [];
