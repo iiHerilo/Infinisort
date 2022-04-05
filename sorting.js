@@ -4,10 +4,11 @@ const include = [selection, dualselect, insertion, binaryins, bubble, optbubble,
     counting, mergesort, mergeip, lsdten,
 ];
 var exclude = [cycle];
+var currentSort = 0;
 
 function sort() {
     try {
-    if (CFG.auto_mode === 2) {
+    if (CFG.auto_mode === AutoMode.random) {
         var applied = [];
         var prv = -1;
         var neu;
@@ -15,13 +16,25 @@ function sort() {
             shuffle();
             halt(CFG.wait_time);
             do neu = Math.floor(Math.random() * include.length)
-            while ((!CFG.enable_backtoback && neu === prv) || exclude.includes(include[neu]) || applied.includes[include[neu]]);
+            while ((!CFG.enable_backtoback && neu === prv) || exclude.includes(include[neu]) || (applied.includes[neu] && !CFG.enable_repeats));
             prv = neu;
             include[prv]();
-            if (!CFG.enable_repeats) applied.push(neu);
+            if (!CFG.enable_repeats) applied.push(prv);
             detog();
             halt(CFG.wait_time);
         }
+    }
+    else if (CFG.auto_mode === AutoMode.linear) {
+        for(let i = 0; i < CFG.amnt_per_cycle; i++) {
+            if (currentSort >= include.length) 
+                currentSort = 0;
+            if (!exclude.includes(include)) 
+                include[currentSort]();
+            currentSort++;
+        }
+    }
+    else if (CFG.auto_mode === AutoMode.manual) {
+        include[CFG.auto_manual]();
     }
     }
     catch(e) {console.error(e)}

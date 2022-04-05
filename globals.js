@@ -1,5 +1,5 @@
 /*** GLOBAL CONFIG ***/
-var CFG = {
+const CFG = {
     version: "v1.2.2a",
     debug_enabled: false,
     show_globals: false,
@@ -8,7 +8,7 @@ var CFG = {
     enable_repeats: false,
     enable_backtoback: false,
     disable_toggles: false,
-    auto_mode: 2,
+    auto_mode: AutoMode.random,
     auto_manual: 1,
     wait_time: 75,
     amnt_per_cycle: 10,
