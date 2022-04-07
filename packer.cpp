@@ -18,7 +18,6 @@ int main() {
     while(pos != -1) {
         pos = str.find("<script", pos);
         if(pos != -1) {
-            int p2 = pos + 13;
             int nd = str.find("</script>", pos);
             string path = "";
             string node = str.substr(pos, nd + 9 - pos);
