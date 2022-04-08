@@ -29,13 +29,21 @@ int main() {
                 ss << m.rdbuf();
                 code = ss.str();
             }
-            cout << code << endl;
+            cout << "<script>\n" + code + "\n</script>\n" << endl;
             m.close();
-            str = str.replace(pos, str.find("pt>") + 3 - pos, code);
+            str = str.replace(pos, str.find("pt>") + 3 - pos, "&lt;script id=\"" + path + "\"&gt;\n" + code + "\n&lt;/script&gt;\n");
         }
     } 
-    str.replace(str.find("<!-- scripts -->"), 16, "<script>");
-    str.replace(str.find("<!--   end   -->"), 16, "</script>");
+    for(int i = 0; i < str.length()-4; i++) {
+        if(str.substr(i, 4) == "&lt;") {
+            str = str.replace(i, 4, "<");
+        }
+        if(str.substr(i, 4) == "&gt;") {
+            str = str.replace(i, 4, ">");
+        }
+    }
+    //str.replace(str.find("<!-- scripts -->"), 16, "<script>");
+    //str.replace(str.find("<!--   end   -->"), 16, "</script>");
     f.close();
 
     ofstream output;
