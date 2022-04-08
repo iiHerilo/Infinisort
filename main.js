@@ -56,7 +56,7 @@ function draw() {
         })
     
     element(ID.auxzone).style.display = detaux ? "none" : "block";
-    if(counter % 5 == 0) {
+    if(counter % CFG.processor_speed == 0) {
         updateDebugMenu();
         counter = 0;
     }
