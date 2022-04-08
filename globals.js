@@ -29,6 +29,11 @@ const CFG = {
     qs_directional: true, // true: Right, Middle, Left     false: Maximum, Median, Minimum     (related to quicksort)
     log_all_tasks: false,
 };
+const DBG = {
+    frame_time: [],
+    tasks_per_frame: [],
+    current: "None",
+};
 /*** ELEMENT IDS ***/
 const ID = {
     main: "maincanv",
@@ -61,3 +66,10 @@ var dimensions = {
     y: -1, // center y
     r: -1, // radius
 };
+
+function dbgShiftInWindow(index, key, range = CFG.processor_speed) {
+    console.log(key);
+    DBG[key].push(index);
+    if(DBG[key].length >= range)
+        DBG[key].shift();
+}

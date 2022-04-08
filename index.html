@@ -13,6 +13,7 @@
         <script src="charts.js"></script>
         <script src="sorting.js"></script>
         <script src="animator.js"></script>
+        <script src="debug.js"></script>
         <script src="main.js"></script>
         <!--   end   -->
         <style>
@@ -26,10 +27,36 @@
                 height: auto;
                 width:  auto;
             }
+            div.sideBarLeft {
+                height: 100%;
+                width: 15%;
+                position: fixed;
+                z-index: 1;
+                top: 0;
+                left: 0;
+                background-color: #777;
+                overflow-x: hidden;
+                padding-top: 20px;
+                color: #FFF;
+                font-family: 'courier-new', monospace;
+            }
+            th {
+                text-align:left;
+            }
+            td {
+                text-align:right;
+            }
+            table {
+                width:100%;
+            }
         </style>
     </head>
     <body onload="init()">
         <div class="main">
+            <div class="sideBarLeft" id="debugmnu">
+                <h2>DEBUG:</h2>
+                
+            </div>
             <h1 id="title">
                 Infinisort
             </h1>

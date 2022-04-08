@@ -16,10 +16,16 @@ function init() {
     dimensions.r = ((dimensions.x + dimensions.y) / 2) - CFG.rad_tolerance;
     element("version").innerHTML = CFG.version;
     halt(CFG.wait_time);
+    buildDebugMenu();
     draw();
 }
-
+var currentTime = Date.now();
+var counter = 0;
 function draw() {
+    counter++;
+    dbgShiftInWindow(Date.now() - currentTime, 'frame_time');
+    currentTime = Date.now();
+    
     var good = process();
     PieChart(mainC, {
         data: vdat, // Data to be displayed
@@ -48,8 +54,12 @@ function draw() {
             nun: detaux,
             tru: max,
         })
-
+    
     element(ID.auxzone).style.display = detaux ? "none" : "block";
+    if(counter % 5 == 0) {
+        updateDebugMenu();
+        counter = 0;
+    }
 
     if(detogg) {
         detogg = false;
@@ -59,7 +69,7 @@ function draw() {
     if(!good) {
         sort();
     }
-
+    
     window.requestAnimationFrame(draw);
 }
 

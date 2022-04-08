@@ -1,7 +1,9 @@
 function process() {
+    var ttl = 0;
     for(let i = 0; i < (CFG.processor_speed * Math.ceil(max / CFG.processor_threshold)); i++) {
         if(task.length > 0) {
             var tsk = task.shift();
+            ttl++;
             switch(tsk.type) {
                 case "swap": 
                     var temp = vdat[tsk.a];
@@ -12,6 +14,7 @@ function process() {
                     setCurrentText(tsk.sort);
                     if(tsk.sort !== "Shuffling...")
                         console.log(`Playing ${tsk.sort}`);
+                        DBG.current = tsk.sort;
                     break;
                 case "toggle": 
                     if(tsk.single) 
@@ -77,7 +80,8 @@ function process() {
                     break;
             }
         }
-        else return false
+        else return false;
     }
+    dbgShiftInWindow(ttl, 'tasks_per_frame', 10)
     return true;
 }
