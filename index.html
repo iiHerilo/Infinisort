@@ -4,6 +4,7 @@
         <title>Infinisort</title>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
         <!-- scripts -->
         <script src="enums.js"></script>
         <script src="globals.js"></script>
@@ -29,16 +30,34 @@
             }
             div.sideBarLeft {
                 height: 100%;
-                width: 15%;
-                position: fixed;
+                width: 75%;
                 z-index: 1;
                 top: 0;
                 left: 0;
+                display:block;
                 background-color: #777;
                 overflow-x: hidden;
-                padding-top: 20px;
                 color: #FFF;
+                font-size: 0.625vw;
                 font-family: 'courier-new', monospace;
+                padding-top: 20px;
+                padding-left: 20px;
+                padding-right: 20px;
+                padding-bottom: 20px;
+                float:left;
+            }
+            #debugbar {
+                position: fixed;
+                height: 100%;
+                width: 20%;
+                top: 0;
+                left: 0;
+            }
+            #toggledbg {
+                top:0;
+                float:right;
+                text-align:left;
+                left:0;
             }
             th {
                 text-align:left;
@@ -53,9 +72,12 @@
     </head>
     <body onload="init()">
         <div class="main">
-            <div class="sideBarLeft" id="debugmnu">
-                <h2>DEBUG:</h2>
-                
+            <div id="debugbar">
+                <div class="sideBarLeft" id="debugmnu" style="display:none;">
+                    <h2>DEBUG:</h2>
+
+                </div>
+                <button id="toggledbg">Debug</button>
             </div>
             <h1 id="title">
                 Infinisort
@@ -73,5 +95,17 @@
                 <canvas id="auxcanv" width="100" height="100"></canvas>
             </div>
         </div>
+        <script>
+            var out = false;
+            $(document).ready(function() {
+                $("#toggledbg").click(function () {
+                    if(out) 
+                        $("#debugmnu").slideUp();
+                    else 
+                        $("#debugmnu").slideDown();
+                    out = !out;
+                })
+            })
+        </script>
     </body>
 </html>

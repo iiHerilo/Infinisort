@@ -67,8 +67,7 @@ var dimensions = {
     r: -1, // radius
 };
 
-function dbgShiftInWindow(index, key, range = CFG.processor_speed) {
-    console.log(key);
+function dbgShiftInWindow(index, key, range = CFG.processor_speed * 10) {
     DBG[key].push(index);
     if(DBG[key].length >= range)
         DBG[key].shift();

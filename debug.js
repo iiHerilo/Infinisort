@@ -2,13 +2,12 @@ var debugItems = [
     
 ]
 
-function average(arr) {
-    console.log(arr);
+function average(arr, fixed = true) {
     t = 0;
     for(let i = 0; i < arr.length; i++) 
         t += arr[i];
-    console.log("total:" + t);
-    return parseFloat(t / arr.length).toFixed(2);
+    t = parseFloat(t / arr.length);
+    return fixed ? t.toFixed(2) : t;
 }
 
 function buildDebugMenu() {
@@ -25,16 +24,20 @@ function buildDebugMenu() {
 function updateDebugInfo() {
     debugItems = [
         {
-            label: "Show Aux Visual",
-            value: CFG.show_aux,
+            label: "Time Between Frames",
+            value: average(DBG.frame_time, true) + "ms",
         },
         {
-            label: "Time Between Frames",
-            value: average(DBG.frame_time) + "ms",
+            label: "Framerate",
+            value: (1000/average(DBG.frame_time, false)).toFixed(2) + "FPS",
         },
         {
             label: "Amount of toggles",
-            value: togs.length + (sing != -1 ? 1 : 0),
+            value: togs.length + (sing < 0 ? 0 : 1),
+        },
+        {
+            label: "Single Toggle Location",
+            value: sing,
         },
         {
             label: "Tasks in queue",
