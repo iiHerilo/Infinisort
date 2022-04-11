@@ -81,8 +81,8 @@ function clamp() {
     calcHeight = parseInt(calcHeight.substring(0, calcHeight.length-2)); // removes the unit (px) from the height
 
     if (wh < ww) {
-        element(ID.main).style.height = `${wh - 300}px`;
-        element(ID.main).style.width = `${wh - 300}px`;
+        element(ID.main).style.height = `${wh - 325}px`;
+        element(ID.main).style.width = `${wh - 325}px`;
     }
     else if (calcHeight > ww){
         element(ID.main).style.height = `auto`;

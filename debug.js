@@ -51,6 +51,22 @@ function updateDebugInfo() {
             label: "Current Sort",
             value: DBG.current,
         },
+        {
+            label: "",
+            value: "",
+        },
+        {
+            label: "",
+            value: "",
+        },
+        {
+            label: "",
+            value: "",
+        },
+        {
+            label: "",
+            value: "",
+        },
     ]
     
 }
