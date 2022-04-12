@@ -7,3 +7,12 @@ class AutoMode {
         this.name = name;
     }
 }
+
+class SoundMode {
+    static frequency = new SoundMode("frequency");
+    static equalizer = new SoundMode("equalizer");
+
+    constructor(name) {
+        this.name = name;
+    }
+}

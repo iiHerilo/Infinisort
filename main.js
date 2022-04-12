@@ -21,6 +21,7 @@ function init() {
 }
 var currentTime = Date.now();
 var counter = 0;
+var test = 0;
 function draw() {
     counter++;
     dbgShiftInWindow(Date.now() - currentTime, 'frame_time');

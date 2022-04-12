@@ -28,6 +28,8 @@ const CFG = {
     verify_after_sort: true,
     qs_directional: true, // true: Right, Middle, Left     false: Maximum, Median, Minimum     (related to quicksort)
     log_all_tasks: false,
+    sound_mode: SoundMode.frequency,
+    compress_sound: true, // i wouldnt reccomend turning this off
 };
 const DBG = {
     frame_time: [],
@@ -46,6 +48,18 @@ const ID = {
     title: "title",
     copyright: "copyright",
 };
+/*** AUDIO SETTINGS ***/
+const audio = {
+    context: Pizzicato.context,
+    muted: true, // audio must be muted as the page loads or the audio will not work
+    frequency: {
+        lower: 146.83,
+        upper: 293.66,
+    },
+    volume: 0.5,
+    oscillator: "square",
+    queue: [],
+}
 
 var mainC; // Main Canvas
 var auxlC; // Auxiliary Canvas
