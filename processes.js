@@ -154,8 +154,23 @@ function halt(length = CFG.wait_time) {
     debug(`HALT ${length} frames`);
 }
 
-function sound(index) {
-    // To be implemented...
+function sound(value, layer = 0, isIndex = true) {
+    if(isIndex) value = data[value];
+    task.push({
+        type: "sound",
+        value: value,
+        layer: layer,
+    })
+}
+function soundmulti(array, isIndex = true) {
+    for(let i = 0; i < array.length; i++) {
+        if(isIndex) array[i] = data[array[i]]
+        task.push({
+            type: "sound",
+            value: array[i],
+            layer: i,
+        })
+    }
 }
 
 

@@ -14,15 +14,17 @@ var currentSort = 0;
 // 
 function sort() {
     try {
+        
     if (CFG.auto_mode === AutoMode.random) {
         var applied = []; // Here to stop repeats if disabled
         var prv = -1; // Here to stop back-to-backs if disabled
-        var neu; // ditto
+        var neu = -1; // ditto
         for (let i = 0; i < CFG.amnt_per_cycle; i++) {
+            
             shuffle();
             halt(CFG.wait_time);
             do neu = Math.floor(Math.random() * include.length)
-            while ((!CFG.enable_backtoback && neu === prv) || exclude.includes(include[neu]) || (applied.includes[neu] && !CFG.enable_repeats));
+            while ((!CFG.enable_backtoback && neu === prv) || exclude.includes(include[neu]) || (applied.includes(neu) && !CFG.enable_repeats));
             prv = neu;
             include[prv]();
             if (!CFG.enable_repeats) applied.push(prv);
@@ -31,6 +33,8 @@ function sort() {
         }
     }
     else if (CFG.auto_mode === AutoMode.linear) {
+        shuffle();
+        halt(CFG.wait_time);
         for(let i = 0; i < CFG.amnt_per_cycle; i++) {
             if (currentSort >= include.length) 
                 currentSort = 0;
@@ -38,10 +42,15 @@ function sort() {
                 include[currentSort]();
             currentSort++;
         }
+        halt(CFG.wait_time);
     }
     else if (CFG.auto_mode === AutoMode.manual) {
+        shuffle();
+        halt(CFG.wait_time);
         include[CFG.auto_manual]();
+        halt(CFG.wait_time);
     }
+    
     }
     catch(e) {console.error(e)} // This is here so that the whole page & animation doesn't stop in the event of an exception.
 }
@@ -77,6 +86,8 @@ function shuffle(asMode = true) {
         var ran = Math.floor(Math.random() * max);
         toggle(i, false);
         toggle(ran, false);
+        sound(i, 0);
+        sound(ran, 1);
         swap(i, ran);
         if (i % 2 === 0) detog();
     }
@@ -91,6 +102,8 @@ function reverse(asMode = true) {
     for (let i = 0; i < Math.floor(max / 2); i++) {
         detog();
         swap(i, max - i - 1);
+        sound(i, 0);
+        sound(max - i, 1);
         toggle(i);
         toggle(max - i - 1);
     }
@@ -120,6 +133,7 @@ function selection() {
                 aux(b, true, "Selection")
             }
             toggle(c, false, true);
+            sound(c, 0);
         }
         swap(a, b);
         detog();
@@ -138,6 +152,7 @@ function dualselect() {
         var maxi = i;
 
         for (var k = i; k <= j; k++) {
+            sound(k);
             toggle(k, !(k % 3 == 2), true);
             if (data[k] > maxv) {
                 maxv = data[k];
@@ -166,6 +181,8 @@ function insertion() {
     for (a = 0; a < max; a++) {
         toggle(a);
         for (b = a; b > 0 && data[b - 1] > data[b]; b--) {
+            sound(b, 0);
+            sound(b-1, 1);
             swap(b, b - 1);
             detog();
             toggle(a);
@@ -184,6 +201,7 @@ function binaryins() {
             return (item >= data[low]) ? (low + 1) : low;
         var mid = Math.floor((low + high) / 2);
         toggle(mid);
+        sound(mid, 1);
         if (item == data[mid])
             return mid + 1;
         if (item > data[mid])
@@ -200,6 +218,7 @@ function binaryins() {
         while (j >= pos) {
             insert(j + 1, data[j]);
             toggle(j, true, true);
+            sound(j);
             aux([x, j], false, "Comparison")
             j--;
         }
@@ -216,8 +235,10 @@ function bubble() {
         b = 0;
         for (c = 1; c < a; c++) {
             if (data[c - 1] > data[c]) {
+                sound(c);
+                sound(c-1, 1);
                 swap(c - 1, c);
-                hop((c % 3 === 0 ? 0 : 3)); // shortens the animation time
+                //hop((c % 3 === 0 ? 0 : 3)); // shortens the animation time
                 //console.log("c%3=" + c%3 + " so hop " + (c % 3 === 0 ? 0 : 1))
                 detog();
                 b = c;
@@ -236,8 +257,10 @@ function optbubble() {
         swapped = false;
         for (let j = 0; j < max - i - 1; j++) {
             if (data[j] > data[j + 1]) {
+                sound(j);
+                sound(j+1, 1);
                 swap(j, j + 1);
-                hop((j % 3 === 0 ? 0 : 3));
+                //hop((j % 3 === 0 ? 0 : 3));
                 swapped = true;
                 detog();
                 toggle(j, true);
@@ -260,6 +283,8 @@ function cocktail() {
         for (let i = start; i < end; i++) {
             if (data[i] > data[i + 1]) {
                 swapped = true;
+                sound(i);
+                sound(i+1, 1);
                 swap(i, i + 1);
                 hop((i % 3 === 0 ? 0 : 3));
                 detog();
@@ -271,6 +296,8 @@ function cocktail() {
         for (let i = end; i >= start; i--) {
             if (data[i] > data[i + 1]) {
                 swapped = true;
+                sound(i);
+                sound(i+1, 1);
                 swap(i, i + 1);
                 hop((i % 3 === 0 ? 0 : 3));
                 detog();
@@ -309,6 +336,8 @@ function quicksort(mode = 0) {
                 i++;
                 toggle(i, false);
                 toggle(j, false);
+                sound(i);
+                sound(j, 1)
                 swap(i, j);
                 detog();
             }
@@ -382,6 +411,9 @@ function qsdual() {
             detog();
             toggle(j, false);
             toggle(g);
+            sound(j, 0);
+            //sound(g, 1);
+            //sound(k, 2);
             toggle(k, false);
             if (data[k] < p) {
                 swap(k, j);
@@ -442,6 +474,7 @@ function qstable() {
             toggle(low + i);
             var val = arr[i];
             toggle(val, true);
+            soundmulti([low + i, val]);
             if (val < piv)
                 sml.push(val);
             else if (val > piv)
@@ -502,6 +535,7 @@ function heapsort(b = true) {
         toggle(tar, false);
 
         if (tar != i) {
+            soundmulti([i, tar])
             swap(i, tar);
             detog();
             heap(n, tar, b);
@@ -555,6 +589,7 @@ function ternheap() {
         toggle(m);
         toggle(r);
         toggle(i);
+        soundmulti([i, l, m, r]);
         if (top !== i) {
             swap(i, top);
             heap(top, n);
@@ -578,6 +613,7 @@ function oddeven() {
         for (let i = 1; i <= max - 2; i += 2) {
             if (data[i] > data[i + 1]) {
                 toggle(i, true);
+                sound(i)
                 swap(i, i + 1);
                 srtd = false;
                 detog();
@@ -586,6 +622,7 @@ function oddeven() {
         for (let i = 0; i <= max - 2; i += 2) {
             if (data[i] > data[i + 1]) {
                 toggle(i, true);
+                sound(i);
                 swap(i, i + 1);
                 srtd = false;
                 detog();
@@ -603,6 +640,7 @@ function gnome() {
     var iterations = 0;
     var cieling = max * max;
     while (i < max && iterations++ <= cieling) {
+        sound(i);
         if (i === 0 || data[i] >= data[i - 1]) {
             toggle(i, false, true);
             i++;
@@ -624,6 +662,7 @@ function optgnome() {
     function gno(bound) {
         for (let i = bound; i > 0 && data[i - 1] > data[i]; i--) {
             toggle(bound, true);
+            soundmulti(i, i-1);
             swap(i - 1, i);
             toggle(i - 1, false, true);
         }
@@ -655,6 +694,7 @@ function comb() {
         for (let i = 0; i < max - g; i++) {
             toggle(i);
             toggle(i + g);
+            soundmulti([i, i+g])
             if (data[i] > data[i + g]) {
                 swap(i, i + g);
                 swp = true;
@@ -677,6 +717,7 @@ function circle() {
         while (lo < hi) {
             toggle(lo);
             toggle(hi);
+            soundmulti([lo, hi])
             if (data[lo] > data[hi]) {
                 swap(lo, hi);
                 swp = true;
@@ -756,12 +797,14 @@ function lsd(base) {
     var sorted = false;
     var expo = 1;
     while (!sorted) {
+        halt(1);
         for (let i = 0; i < base; i++)
             buckets[i] = [];
 
         sorted = true;
         for (i = 0; i < max; i++) {
             toggle(i, false);
+            sound(i);
             var b = Math.floor(Math.floor((data[i] / expo)) % base);
             if (b > 0) sorted = false;
             buckets[b].push(i);
@@ -782,6 +825,7 @@ function lsd(base) {
                     insert(solid, buckets[i].shift());
                     filled = false;
                     toggle(solid, true);
+                    sound(solid);
                 }
 
                 solid += index + buckets[i].length;
@@ -808,13 +852,15 @@ function shell() {
             detog();
             toggle(i, false, false);
             var temp = data[i];
+            var m = 0;
             let j;
             for (j = i; j >= gap && data[j - gap] > temp; j -= gap) {
                 insert(j, data[j - gap]);
                 //detog();
                 toggle(j, true, false);
+                sound(j, m++)
                 //toggle(data[j-gap]);
-                toggle(j - gap);
+                toggle(j - gap, m++);
             }
             insert(j, temp);
         }
@@ -837,12 +883,14 @@ function counting() {
         toggle(i, false, true);
         toggle(i, false, true);
         toggle(i, false, true);
+        sound(i);
     }
     for (let i = 1; i < count.length; i++) {
         count[i] += count[i - 1];
         toggle(i, false, true);
         toggle(i, false, true);
         toggle(i, false, true);
+        sound(i);
     }
     for (let i = n - 1; i >= 0; i--) {
         out[count[data[i]] - 1] = data[i];
@@ -852,6 +900,7 @@ function counting() {
         insert(i, out.shift());
         toggle(i, false, true);
         toggle(i, false, true);
+        sound(i);
     }
 }
 
@@ -867,11 +916,13 @@ function mergesort() {
             L[i] = data[l + i];
             detog();
             toggle(l + i);
+            sound(l + i);
         }
         for (var j = 0; j < n2; j++) {
             R[j] = data[m + 1 + j];
             detog();
             toggle(m + l + j);
+            sound(m + l + j)
         }
 
         var i = 0;
@@ -882,9 +933,11 @@ function mergesort() {
             toggle(k);
             if (L[i] <= R[j]) {
                 insert(k, L[i]);
+                sound(k);
                 i++;
             } else {
                 insert(k, R[j]);
+                sound(k);
                 j++;
             }
             k++;
@@ -938,6 +991,7 @@ function mergeip() {
                     toggle(start, true);
                     toggle(start2, true);
                     toggle(index, true, true);
+                    soundmulti([index, index-1]);
                     insert(index, data[index - 1]);
                     hop(index % 3 === 2 ? 3 : 2);
                     index--;

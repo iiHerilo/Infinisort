@@ -9,7 +9,7 @@ const CFG = {
     enable_backtoback: false,
     disable_toggles: false,
     auto_mode: AutoMode.random,
-    auto_manual: 1, // index of the sort that will be played in manual mode
+    auto_manual: 15, // index of the sort that will be played in manual mode
     wait_time: 75, // in frames
     amnt_per_cycle: 10, // amount of sorts
     processor_speed: 6, // determines how many tasks get processed in any given frame
@@ -54,11 +54,12 @@ const audio = {
     muted: true, // audio must be muted as the page loads or the audio will not work
     frequency: {
         lower: 146.83,
-        upper: 293.66,
+        upper: 1174.66,
     },
     volume: 0.5,
     oscillator: "square",
     queue: [],
+    focus: true, // whether the tab is currently focused, so that the sound doesnt break when you click off the tab
 }
 
 var mainC; // Main Canvas
@@ -73,6 +74,7 @@ var sing = -1; // Singular Toggles
 var detaux = false; // Whether the aux should be drawn when enabled
 var detogg = false; // Whether the toggles should be cleared
 var task = []; // Task Queue
+var snds = []; // Sounds in a frame
 var dimensions = {
     h: -1, // height
     w: -1, // width

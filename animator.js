@@ -61,17 +61,21 @@ function process() {
                     if(tsk.length > 0) {
                         task.unshift({type: "wait", length: tsk.length-1});
                         i = 9999;
+                        snds = [];
                     }
                     break;
                 case "reset":
                     vdat = sequence(0, max);
                     break;
-                case "sound": break;
+                case "sound": 
+                    snds[tsk.layer] = tsk.value;
+                    break;
             }
             switch(tsk.type) {
                 case "toggle" :
                     if(CFG.disable_toggles || tsk.shrink) --i;
                     break;
+                case "sound":
                 case "aux":
                     i--;
                     break;

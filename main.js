@@ -1,4 +1,5 @@
 function init() {
+    Pizzicato.volume = 0.1;
     window.addEventListener('resize', clamp)
     clamp();
     console.info("CONFIG: %o", CFG);
@@ -62,6 +63,12 @@ function draw() {
         counter = 0;
     }
 
+    
+    playSound(snds);
+    if(snds == []) {
+        stopAllSounds();
+    }
+
     if(detogg) {
         detogg = false;
         togs = [];
@@ -94,3 +101,4 @@ function clamp() {
 }
 
 window.onresize = clamp;
+
