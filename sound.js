@@ -18,11 +18,8 @@ function playSound(values) {
         // This makes sure the volume remains consistent, no matter how many sounds are being played at once
         if(CFG.compress_sound) 
             options.volume /= values.length;
-        if(CFG.sound_mode === SoundMode.frequency) {
-            var f = (audio.frequency.upper - audio.frequency.lower) / max;
-            f = f / max;
+        if(CFG.sound_mode === SoundMode.frequency) 
             options.frequency = audio.frequency.lower + ((audio.frequency.upper - audio.frequency.lower) / max) * values[i];
-        }
 
         audio.queue[i] = new Pizzicato.Sound({
             source: 'wave',
