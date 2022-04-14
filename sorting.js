@@ -662,7 +662,7 @@ function optgnome() {
     function gno(bound) {
         for (let i = bound; i > 0 && data[i - 1] > data[i]; i--) {
             toggle(bound, true);
-            soundmulti(i, i-1);
+            soundmulti([i, i-1]);
             swap(i - 1, i);
             toggle(i - 1, false, true);
         }
