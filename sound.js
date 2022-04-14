@@ -19,7 +19,7 @@ function playSound(values) {
         if(CFG.compress_sound) 
             options.volume /= values.length;
         if(CFG.sound_mode === SoundMode.frequency) 
-            options.frequency = audio.frequency.lower + ((audio.frequency.upper - audio.frequency.lower) / max) * values[i];
+            options.frequency = audio.frequency.lower + ((audio.frequency.upper - audio.frequency.lower) / max) * (values[i] + 1);
 
         audio.queue[i] = new Pizzicato.Sound({
             source: 'wave',
