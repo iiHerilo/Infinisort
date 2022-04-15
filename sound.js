@@ -3,6 +3,8 @@ function toggleMute() {
     audio.context.resume();
 }
 
+
+
 function playSound(values) {
     stopAllSounds();
     if(!audio.muted && audio.focus) {
@@ -15,9 +17,6 @@ function playSound(values) {
             attack: 0,
             release: 0,
         }
-        // This makes sure the volume remains consistent, no matter how many sounds are being played at once
-        if(CFG.compress_sound) 
-            options.volume /= values.length;
         if(CFG.sound_mode === SoundMode.frequency) 
             options.frequency = audio.frequency.lower + ((audio.frequency.upper - audio.frequency.lower) / max) * (values[i] + 1);
 
@@ -25,14 +24,18 @@ function playSound(values) {
             source: 'wave',
             options,
         })
-        audio.queue[i].play();
+        audio.group.addSound(audio.queue[i]);
     }
+    audio.group.play();
     }
 }
 
 
 function stopAllSounds() {
-    for(w of audio.queue) w.stop();
+    audio.group.stop();
+    for(w of audio.queue) {
+        audio.group.removeSound(w);
+    }
     audio.queue = [];
 }
 

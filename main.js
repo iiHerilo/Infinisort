@@ -1,5 +1,6 @@
 function init() {
     Pizzicato.volume = 0.1;
+    audio.group.addEffect(new Pizzicato.Effects.Compressor());
     window.addEventListener('resize', clamp)
     clamp();
     console.info("CONFIG: %o", CFG);

@@ -29,7 +29,6 @@ const CFG = {
     qs_directional: true, // true: Right, Middle, Left     false: Maximum, Median, Minimum     (related to quicksort)
     log_all_tasks: false,
     sound_mode: SoundMode.frequency,
-    compress_sound: true, // i wouldnt reccomend turning this off
 };
 const DBG = {
     frame_time: [],
@@ -60,6 +59,7 @@ const audio = {
     oscillator: "square",
     queue: [],
     focus: true, // whether the tab is currently focused, so that the sound doesnt break when you click off the tab
+    group: new Pizzicato.Group(),
 }
 
 var mainC; // Main Canvas
