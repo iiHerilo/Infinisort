@@ -46,6 +46,7 @@ const ID = {
     debug: "debugmnu",
     title: "title",
     copyright: "copyright",
+    mute: "mutebutton",
 };
 /*** AUDIO SETTINGS ***/
 const audio = {

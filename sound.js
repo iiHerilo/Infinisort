@@ -1,6 +1,7 @@
 function toggleMute() {
     audio.muted = !audio.muted;
     audio.context.resume();
+    element(ID.mute).innerHTML = audio.muted ? "Unmute" : "Mute";
 }
 
 
