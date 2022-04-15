@@ -55,10 +55,10 @@
                 top: 0;
                 left: 0;
             }
-            #toggledbg {
+            #options {
                 top:0;
                 float:right;
-                text-align:left;
+                text-align:center;
                 left:0;
             }
             th {
@@ -80,10 +80,12 @@
 
                 </div>
                 
-                <button id="toggledbg">Debug</button>
-                
+                <div id="options">
+                    <button id="toggledbg">Debug</button><br>
+                    <button onclick="toggleMute()">Mute</button>
+                </div>
             </div>
-            <button id="toggledbg" onclick="toggleMute()">Mute/Unmute</button>
+            
             <h1 id="title">
                 Infinisort
             </h1>
