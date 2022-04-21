@@ -412,8 +412,8 @@ function qsdual() {
             toggle(j, false);
             toggle(g);
             sound(j, 0);
-            //sound(g, 1);
-            //sound(k, 2);
+            sound(g, 1);
+            sound(k, 2);
             toggle(k, false);
             if (data[k] < p) {
                 swap(k, j);
@@ -491,6 +491,7 @@ function qstable() {
         var j = low;
         for (let i = 0; i < sml.length; i++) {
             toggle(j, true, true);
+            sound(j);
             insert(j++, sml[i]);
             s1.shift();
             auxmulti([s1, g1], "Partitions");
@@ -498,6 +499,7 @@ function qstable() {
         insert(j++, piv);
         for (let i = 0; i < grt.length; i++) {
             toggle(j, true, true);
+            sound(j)
             insert(j++, grt[i]);
             g1.shift();
             auxmulti([s1, g1], "Partitions");
