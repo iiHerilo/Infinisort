@@ -24,9 +24,11 @@ function playSound(values) {
                         audio.queue[i].stop();
                     }
             }
+            dbgShiftInWindow(`[${values.join(", ")}]`, "sounds", 6);
+            console.log(values);
             //audio.group.play();
         }
-        dbgShiftInWindow(`[${values.join(", ")}]`, "sounds", 5);
+        
     } catch (e) {
         console.error(e);
     }
