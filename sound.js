@@ -7,39 +7,60 @@ function toggleMute() {
 
 
 function playSound(values) {
-    stopAllSounds();
-    if(!audio.muted && audio.focus) {
-    for(let i = 0; i < values.length; i++) {
-        if(values[i] < 0) continue;
-        var options = {
-            volume: audio.muted ? 0 : audio.volume,
-            type: audio.oscillator,
-            frequency: audio.frequency.lower,
-            attack: 0,
-            release: 0,
+    try {
+        if(values.length == 0) {
+            resetAudio();
         }
-        if(CFG.sound_mode === SoundMode.frequency) 
-            options.frequency = audio.frequency.lower + ((audio.frequency.upper - audio.frequency.lower) / max) * (values[i] + 1);
+        else if(!audio.muted && values.length > 0) {
+            for(let i = 0; i < audio.queue.length; i++) {
+                    if(typeof values[i] !== "undefined") {
+                        if (CFG.sound_mode === SoundMode.frequency) 
+                            audio.queue[i].frequency = round(audio.frequency.lower + ((audio.frequency.upper - audio.frequency.lower) / max) * (values[i] + 1), values[i]);
+                        audio.queue[i].volume = audio.volume;
+                        audio.queue[i].play();
+                    }
+                    else {
+                        audio.queue[i].volume = 0;
+                        audio.queue[i].stop();
+                    }
+            }
+            //audio.group.play();
+        }
+        dbgShiftInWindow(`[${values.join(", ")}]`, "sounds", 5);
+    } catch (e) {
+        console.error(e);
+    }
+}
 
+function resetAudio() {
+    audio.group.stop();
+    audio.group = new Pizzicato.Group();
+    audio.group.addEffect(new Pizzicato.Effects.Compressor());
+    for(let i = 0; i < CFG.sound_queue_length; i++) {
         audio.queue[i] = new Pizzicato.Sound({
             source: 'wave',
-            options,
-        })
+            options: {
+                volume: 0,
+                type: audio.oscillator,
+                frequency: audio.frequency.lower,
+                attack: 0.0,
+                release: 0.1,
+            },
+        });
         audio.group.addSound(audio.queue[i]);
-    }
-    audio.group.play();
     }
 }
 
 
 function stopAllSounds() {
-    audio.group.stop();
-    for(w of audio.queue) {
-        audio.group.removeSound(w);
-    }
-    audio.queue = [];
+    resetAudio();
 }
 
 $(window).blur(function(e) {
     stopAllSounds();
 });
+
+
+function round(i, j) {
+    return i.toFixed(2);
+}

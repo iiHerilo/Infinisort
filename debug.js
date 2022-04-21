@@ -52,8 +52,8 @@ function updateDebugInfo() {
             value: DBG.current,
         },
         {
-            label: "",
-            value: "",
+            label: "Sound Values",
+            value: DBG.sounds.join("<br>")
         },
         {
             label: "",

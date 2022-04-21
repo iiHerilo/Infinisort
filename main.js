@@ -1,8 +1,7 @@
 function init() {
-    Pizzicato.volume = 0.1;
-    audio.group.addEffect(new Pizzicato.Effects.Compressor());
     window.addEventListener('resize', clamp)
     clamp();
+    resetAudio();
     console.info("CONFIG: %o", CFG);
     max = CFG.default_array_length;
     data = sequence(0, max);
