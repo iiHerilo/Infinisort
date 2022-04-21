@@ -855,12 +855,12 @@ function shell() {
             toggle(i, false, false);
             var temp = data[i];
             var m = 0;
-            let j;
+            sound(i);
             for (j = i; j >= gap && data[j - gap] > temp; j -= gap) {
                 insert(j, data[j - gap]);
                 //detog();
                 toggle(j, true, false);
-                sound(j, m++)
+                sound(j, 1);
                 //toggle(data[j-gap]);
                 toggle(j - gap, m++);
             }
