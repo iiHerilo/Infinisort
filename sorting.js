@@ -919,12 +919,14 @@ function mergesort() {
             detog();
             toggle(l + i);
             sound(l + i);
+            auxmulti([L, R], "Auxiliary Arrays");
         }
         for (var j = 0; j < n2; j++) {
             R[j] = data[m + 1 + j];
             detog();
-            toggle(m + l + j);
-            sound(m + l + j)
+            toggle(m + 1 + j);
+            sound(m + 1 + j)
+            auxmulti([L, R], "Auxiliary Arrays");
         }
 
         var i = 0;
@@ -972,6 +974,7 @@ function mergesort() {
     }
     log("Merge Sort");
     sort(0, max);
+    detog();
 }
 
 function mergeip() {
