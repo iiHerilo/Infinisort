@@ -25,10 +25,8 @@ function playSound(values) {
                     }
             }
             dbgShiftInWindow(`[${values.join(", ")}]`, "sounds", 6);
-            console.log(values);
             //audio.group.play();
         }
-        
     } catch (e) {
         console.error(e);
     }
