@@ -592,7 +592,6 @@ function ternheap() {
         toggle(r);
         toggle(i);
         soundmulti([l, m, r].some((e) => e > max) ? [i] : [i, l, m, r]);
-        console.log([i, l, m, r]);
         if (top !== i) {
             swap(i, top);
             heap(top, n);
