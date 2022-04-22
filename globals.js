@@ -1,6 +1,6 @@
 /*** GLOBAL CONFIG ***/
 const CFG = {
-    version: "v1.2.2-dev",
+    version: "v1.2.3-dev",
     debug_enabled: false,
     show_globals: false,
     detailed_console: true,
