@@ -101,4 +101,3 @@ function clamp() {
 }
 
 window.onresize = clamp;
-
