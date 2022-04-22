@@ -1,6 +1,7 @@
 function init() {
     window.addEventListener('resize', clamp)
     clamp();
+    resetAudio();
     console.info("CONFIG: %o", CFG);
     max = CFG.default_array_length;
     data = sequence(0, max);
@@ -21,6 +22,7 @@ function init() {
 }
 var currentTime = Date.now();
 var counter = 0;
+var test = 0;
 function draw() {
     counter++;
     dbgShiftInWindow(Date.now() - currentTime, 'frame_time');
@@ -59,6 +61,12 @@ function draw() {
     if(counter % 2 == 0) {
         updateDebugMenu();
         counter = 0;
+    }
+
+    
+    playSound(snds);
+    if(snds == []) {
+        stopAllSounds();
     }
 
     if(detogg) {

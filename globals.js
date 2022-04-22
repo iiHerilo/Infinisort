@@ -1,6 +1,6 @@
 /*** GLOBAL CONFIG ***/
 const CFG = {
-    version: "v1.2.3",
+    version: "v1.2.3-dev",
     debug_enabled: false,
     show_globals: false,
     detailed_console: true,
@@ -9,7 +9,7 @@ const CFG = {
     enable_backtoback: false,
     disable_toggles: false,
     auto_mode: AutoMode.random,
-    auto_manual: 1, // index of the sort that will be played in manual mode
+    auto_manual: 15, // index of the sort that will be played in manual mode
     wait_time: 75, // in frames
     amnt_per_cycle: 10, // amount of sorts
     processor_speed: 6, // determines how many tasks get processed in any given frame
@@ -28,11 +28,14 @@ const CFG = {
     verify_after_sort: true,
     qs_directional: true, // true: Right, Middle, Left     false: Maximum, Median, Minimum     (related to quicksort)
     log_all_tasks: false,
+    sound_mode: SoundMode.frequency,
+    sound_queue_length: 16,
 };
 const DBG = {
     frame_time: [],
     tasks_per_frame: [],
     current: "None",
+    sounds: [],
 };
 /*** ELEMENT IDS ***/
 const ID = {
@@ -45,7 +48,22 @@ const ID = {
     debug: "debugmnu",
     title: "title",
     copyright: "copyright",
+    mute: "mutebutton",
 };
+/*** AUDIO SETTINGS ***/
+const audio = {
+    context: Pizzicato.context,
+    muted: true, // audio must be muted as the page loads or the audio will not work
+    frequency: {
+        lower: 146.83,
+        upper: 1174.66,
+    },
+    volume: 0.5,
+    oscillator: "triangle",
+    queue: [],
+    focus: true, // whether the tab is currently focused, so that the sound doesnt break when you click off the tab
+    group: new Pizzicato.Group(),
+}
 
 var mainC; // Main Canvas
 var auxlC; // Auxiliary Canvas
@@ -59,6 +77,7 @@ var sing = -1; // Singular Toggles
 var detaux = false; // Whether the aux should be drawn when enabled
 var detogg = false; // Whether the toggles should be cleared
 var task = []; // Task Queue
+var snds = []; // Sounds in a frame
 var dimensions = {
     h: -1, // height
     w: -1, // width

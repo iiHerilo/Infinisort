@@ -16,6 +16,7 @@
         <script src="sorting.js"></script>
         <script src="animator.js"></script>
         <script src="debug.js"></script>
+        <script src="sound.js"></script>
         <script src="main.js"></script>
         <!--   end   -->
         <style>
@@ -54,10 +55,10 @@
                 top: 0;
                 left: 0;
             }
-            #toggledbg {
+            #options {
                 top:0;
                 float:right;
-                text-align:left;
+                text-align:center;
                 left:0;
             }
             th {
@@ -79,8 +80,12 @@
 
                 </div>
                 
-                <button id="toggledbg">Debug</button>
+                <div id="options">
+                    <button id="toggledbg">Debug</button><br>
+                    <button id="mutebutton" onclick="toggleMute()">Unmute</button>
+                </div>
             </div>
+            
             <h1 id="title">
                 Infinisort
             </h1>
