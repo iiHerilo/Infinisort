@@ -36,7 +36,7 @@ function updateDebugInfo() {
             value: togs.length + (sing < 0 ? 0 : 1),
         },
         {
-            label: "Single Toggle Location",
+            label: "Singletog Location",
             value: sing,
         },
         {
