@@ -13,11 +13,11 @@ int main() {
         ss << f.rdbuf();
         str = ss.str();
     }
-    int pos = 0;
+    int pos = str.find("<!-- scripts -->");
     deque<string> modules;
-    while(pos != -1) {
+    while(pos != -1 && pos < str.find("<!--   end   -->")) {
         pos = str.find("<script", pos);
-        if(pos != -1) {
+        if(pos != -1 && pos < str.find("<!--   end   -->")) {
             int nd = str.find("</script>", pos);
             string path = "";
             string node = str.substr(pos, nd + 9 - pos);
@@ -29,9 +29,15 @@ int main() {
                 ss << m.rdbuf();
                 code = ss.str();
             }
+            for(int i = 0; i < code.length(); i++) {
+                //cout << i << " i" << endl;
+                if(code.substr(i, 1) == "\n") {
+                    code = code.replace(i, 1, "\n\t\t\t");
+                }
+            }
             cout << "<script>\n" + code + "\n</script>\n" << endl;
             m.close();
-            str = str.replace(pos, str.find("pt>") + 3 - pos, "&lt;script id=\"" + path + "\"&gt;\n" + code + "\n&lt;/script&gt;\n");
+            str = str.replace(pos, str.find("pt>", pos + 8) + 3 - pos, "&lt;script id=\"" + path + "\"&gt;\n\t\t\t" + code + "\n\t\t&lt;/script&gt;\n");
         }
     } 
     for(int i = 0; i < str.length()-4; i++) {
